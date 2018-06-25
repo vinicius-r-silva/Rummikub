@@ -6,6 +6,14 @@
 
 
 int main(){
-    int  x = 0;
+    LISTA_CARTAS_PTR Baralho = NULL;
+    
+    Cria_Baralho(&Baralho);
+
+    Imprime(Baralho);
+    
+    printf("\n\n\n\n");
+    Imprime_Ordenado(Baralho);
+    
     return 0;
 }

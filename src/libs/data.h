@@ -1,7 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
-#define NAIPE_@ 1
+#define NAIPE_A 1
 
 
 struct lista_cartas {

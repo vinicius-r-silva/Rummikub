@@ -16,17 +16,17 @@ void tirar_carta (LISTA_CARTAS_PTR *lista_cartas, int pos);
 FALTA
 
 OUTROS
-
 colocar jogador em loop
 
-FUNÇÕES
 
-duplicar mesa
-mao para mesa
-verificar_mesa
-jogada inicial > 30
-particionar monte
-verifica fim do jogo
+
+FUNÇÕES
+-->duplicar mesa (para resetar caso a jogada, as "mexidas na mesa" tenham sido invalidas)
+-->mao para mesa (Mandar os ponteiros da mao, o ponteiro do monte, a posição que será colocada no monte, naipe e numero)
+-->verificar_mesa (verifica a validade dos montes, minimos 3 cartas juntas, em ordem com cores diferentes, minimo 3 cartas iguais de cores diferentes
+-->verificar jogada inicial > 30 pontos
+-->particionar monte
+-->verificar fim do jogo
 
 
 

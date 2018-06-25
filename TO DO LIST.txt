@@ -25,8 +25,12 @@ FUNÇÕES
 -->mao para mesa (Mandar os ponteiros da mao, o ponteiro do monte, a posição que será colocada no monte, naipe e numero)
 -->verificar_mesa (verifica a validade dos montes, minimos 3 cartas juntas, em ordem com cores diferentes, minimo 3 cartas iguais de cores diferentes
 -->verificar jogada inicial > 30 pontos
--->particionar monte
+-->cortar monte
 -->verificar fim do jogo
+-->imprimir_mesa
+-->imprimir_mao
+
+
 
 
 

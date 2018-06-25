@@ -3,11 +3,8 @@
 
 /*TO DO
 baralho_para_jogador DONE
-jogador_para_monte
-trocar_posicao DONE
 colocar_carta_na_posicao
 tirar_carta DONE
-exibir_baralho DONE
 */
 struct lista_cartas {
     int naipe; //se for coringa = -1

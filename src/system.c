@@ -41,7 +41,7 @@ void exibir_baralho (LISTA_CARTAS_PTR baralho){
     }
 }
 
-//retira a carta da posiÁ„o dada da lista, comeÁando no 1
+//retira a carta da posi√ß√£o dada da lista, come√ßando no 1
 void tirar_carta (LISTA_CARTAS_PTR *lista_cartas, int pos){
     LISTA_CARTAS_PTR atual = *lista_cartas;
     if (pos == 1){
@@ -52,62 +52,14 @@ void tirar_carta (LISTA_CARTAS_PTR *lista_cartas, int pos){
     for (int i=0; i<pos-1; i++){
         atual = atual->prox;
     }
-    //Se n„o existir a posiÁ„o n„o faz nada
+    //Se n√£o existir a posi√ß√£o n√£o faz nada
     if (atual == NULL) return;
     LISTA_CARTAS_PTR temp = atual->prox;
     atual->prox = temp->prox;
 }
 
-//Troca a posiÁ„o 1 com a 2
-void trocar_posicao (LISTA_CARTAS_PTR *lista_cartas, int pos1, int pos2){
-    //O esquerda fica a esquerda da posiÁ„o que ser· trocada, j· o trocada, aponta para a posiÁ„o que mudar· de lugar, e o direita fica a direita da posiÁ„o
-    LISTA_CARTAS_PTR esquerda1 = *lista_cartas;
-    LISTA_CARTAS_PTR trocada1 = *lista_cartas;
-    LISTA_CARTAS_PTR direita1 = *lista_cartas;
-    LISTA_CARTAS_PTR esquerda2 = *lista_cartas;
-    LISTA_CARTAS_PTR trocada2 = *lista_cartas;
-    LISTA_CARTAS_PTR direita2 = *lista_cartas;
-
-
-    //vai atÈ as posiÁıes corretas
-    if (pos1 == 1){
-        direita1 = direita1->prox;
-    }
-    else {
-        trocada1 = trocada1->prox;
-        direita1 = direita1->prox;
-        direita1 = direita1->prox;
-        for (int i=0; i<pos1-1; i++){
-            esquerda1 = esquerda1->prox;
-            trocada1 = trocada1->prox;
-            direita1 = direita1->prox;
-        }
-    }
-
-
-    direita2 = direita2->prox;
-    direita2 = direita2->prox;
-    trocada2 = trocada2->prox;
-    for (int j=0; j<pos2-1; j++){
-        atual2 = atual2->prox;
-        direita2 = direita2->prox;
-        trocada2 = trocada2->prox;
-    }
-    //ExecuÁ„o da troca
-    esquerda1->prox = trocada2;
-    trocada2->prox = direita1;
-    esquerda2->prox = trocada1;
-    trocada1->prox = direita2;
 }
-
-void trocar_posicao (LISTA_CARTAS_PTR *lista_cartas, int pos1, int pos2){
-    LISTA_CARTAS_PTR temp1 = *lista_cartas;
-    LISTA_CARTAS_PTR temp2 = *lista_cartas;
-
-
-
-}
-//Tira a carta da posiÁ„o 1 da m„o do jogador e coloca na posiÁ„o 2 do monte
+//Tira a carta da posi√ß√£o 1 da m√£o do jogador e coloca na posi√ß√£o 2 do monte
 void jogador_para_monte (LISTA_CARTAS_PTR *mao_jogador, LISTA_CARTAS_PTR *monte, int pos1, int pos2){
     LISTA_CARTAS_PTR lista_mao = *mao_jogador;
     LISTA_CARTAS_PTR lista_monte = *monte;

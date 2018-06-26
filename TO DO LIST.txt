@@ -7,7 +7,13 @@ void Cria_Baralho(LISTA_CARTAS_PTR *Baralho);
 void Imprime(LISTA_CARTAS_PTR Baralho);
 void Imprime_Ordenado(LISTA_CARTAS_PTR Baralho);
 void verificar_mesa 
-
+-->imprimir_mao : é o void Imprime
+-->imprimir_mesa
+-->mao para mesa (Mandar os ponteiros da mao, o ponteiro do monte, a posição que será colocada no monte, naipe e numero)
+int Naipe_2_int
+void int_2_naipe
+void int_2_hexa
+void hexa_2_int
 -----------------------------------------------------------------------------------------------------------
 DEBUGAR
 
@@ -24,12 +30,10 @@ colocar jogadores em loop
 
 FUNÇÕES
 -->duplicar mesa (para resetar caso a jogada, as "mexidas na mesa" tenham sido invalidas)
--->mao para mesa (Mandar os ponteiros da mao, o ponteiro do monte, a posição que será colocada no monte, naipe e numero)
 -->verificar jogada inicial > 30 pontos
 -->cortar monte
 -->verificar fim do jogo
--->imprimir_mesa
--->imprimir_mao
+
 
 
 

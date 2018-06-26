@@ -14,11 +14,10 @@ int Naipe_2_int
 void int_2_naipe
 void int_2_hexa
 void hexa_2_int
+void baralho_para_jogador (LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao_jogador);
+
 -----------------------------------------------------------------------------------------------------------
 DEBUGAR
-
-void baralho_para_jogador (LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao_jogador);
-void tirar_carta (LISTA_CARTAS_PTR *lista_cartas, int pos);
 
 -----------------------------------------------------------------------------------------------------------
 FALTA

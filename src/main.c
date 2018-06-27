@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+
 #include "libs/interfaceIO.h"
 #include "libs/system.h"
 #include "libs/data.h"
@@ -12,6 +14,9 @@ int main(){
     //Cria_Baralho(&Baralho);
     Carrega_Baralho(&Baralho);
 
+    printf("Digite o numero de jogadores:\n");
+    int N_Jogadores = EntradaLimitadaInt(0, INT_MAX);
+
     Imprime(Baralho);
     
     printf("\n\n\n\n");
@@ -21,7 +26,7 @@ int main(){
     int cont;
     LISTA_MESA_PTR Mesa_atual = NULL;
     int define;
-    
+
 
     while(Baralho != NULL){
         if (!ReadInt(&x))

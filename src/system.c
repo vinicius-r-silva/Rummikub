@@ -1,6 +1,44 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "libs/system.h"
+#include "libs/data.h"
 
+
+void ExcluiJogadores(JOGADORES_PTR *Lista_Jogadores){
+    JOGADORES_PTR atual = *Lista_Jogadores;
+    JOGADORES_PTR prev = NULL;
+
+    while(atual != NULL){
+        prev = atual;
+        atual = atual->prox;
+        free(prev);
+    }
+    *Lista_Jogadores = NULL;
+}
+
+void CriaJogadores(JOGADORES_PTR *Lista_Jogadores, int N_Jogadores){
+    ExcluiJogadores(Lista_Jogadores);
+    if (N_Jogadores == 0)
+        return;
+
+    JOGADORES_PTR Prev;
+    JOGADORES_PTR Novo = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+    Novo->Id = 0;
+    Novo->prox = NULL;
+    Novo->cartas = NULL;
+    *Lista_Jogadores = Novo;
+
+    int cont;
+    for (cont = 1 ; cont < N_Jogadores; cont++){
+        Prev = Novo;
+        
+        Novo = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+        Novo->Id = cont;
+        Novo->prox = NULL;
+        Novo->cartas = NULL;
+
+        Prev->prox = Novo;
+    }
+}
 
 void Organiza_Mesa(LISTA_MESA_PTR *Mesa){
     if(*Mesa == NULL) 

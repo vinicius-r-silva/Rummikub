@@ -31,14 +31,14 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
     LISTA_MESA_PTR atual_mesa = *lista_mesa;
     //percorre os ponteiros da mesa atÃ© o ultimo
     while(atual_mesa != NULL){
-        int qtd = 0;
+        int qtd_cartas = 0;
         LISTA_CARTAS_PTR monte1 = atual_mesa->cartas;
         while(monte1 != NULL){
-            qtd++;
+            qtd_cartas++;
             monte1 = monte1->prox;
         }
         //se tiver menos de 3 cartas Ã© invÃ¡lido
-        if (qtd < 3) return 0;
+        if (qtd_cartas < 3) return 0;
 
         monte1 = atual_mesa->cartas;   //reseta para a primera posiÃ§Ã£o do monte
         LISTA_CARTAS_PTR monte2 = atual_mesa->cartas;
@@ -48,6 +48,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //tipo 0: invÃ¡lido
         //tipo 1: sequencia de naipe igual
         //tipo 2: grupo (cartas de numeros iguais de naipes diferentes)
+        //tipo 3: grupo com dois coringas e tres cartas, sem tipo nenhum, apenas e aceitavel
 
         //verificaÃ§Ã£o de uso do naipe, utilizado no case 2
         int usado[4]; //[1, 2, 3, 4] 1-true, 0-false
@@ -58,10 +59,75 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         }
 
 
+        /**----------VERIFICACAO DE TIPO-----------------------**/
+        /**
+        se, e SOMENTE SE!! tiver algum joker fazer o seguinte:
+        colocar as informações (numero) das struct num  vetor de structs
+        ordenar e colocar o joker la no fim
+        depois disso proseguir o restante
+        **/
+
         int tipo = 0;
+        //monte_joker: ajuda na contagem do joker
+        LISTA_CARTAS_PTR monte_joker = monte1;
+
+        int qtd_joker = 0;
+        while(monte_joker != NULL){
+            if (monte_joker->naipe == -1) qtd_joker++;
+            monte_joker = monte_joker->prox;
+        }
+        if (qtd_joker == 2 && qtd_cartas == 3) tipo = 3;
+
+//        while (monte1->naipe == -1 || monte2->naipe == -1){
+//            monte1 = monte1->prox;
+//            monte2 = monte2->prox;
+//        }
+
+        /**ORDENACAO E VERIFICACAO DE TIPO OCORRE NO VETOR, CASO HAJA JOKER**/
+        LISTA_CARTAS_PTR monte_aux = monte1;
+        if (qtd_joker > 0){
+            LISTA_CARTAS vetor[qtd_cartas];
+            for (int i=0; i<qtd_cartas; i++){
+                (vetor[i]).numero = monte_aux->numero;
+                (vetor[i]).naipe = monte_aux->naipe;
+                monte_aux = monte_aux->prox;
+            }
+            //ordenacao no bubble sort
+            int troca = 1;
+            while (troca == 1){
+                troca = 0;
+                for (int j=0; j<qtd_cartas-1; j++){
+                    if (vetor[j].numero > vetor[j+1].numero){
+                        troca = 1;
+                        LISTA_CARTAS aux = vetor[j];
+                        vetor[j] = vetor[j+1];
+                        vetor[j+1] = aux;
+                    }
+                }
+            }
+
+
+
+
+
+
+
+        }
+
+
         if (monte1->naipe == monte2->naipe && monte1->numero == ((monte2->numero) -1)) tipo = 1;
         if (monte1->naipe != monte2->naipe && monte1->numero == monte2->numero) tipo = 2;
         if (tipo == 0) return 0;
+
+
+        /**------FIM DA VERIFICACAO DE TIPO----------------------------**/
+
+        //Assim que verificado o tipo, reseta para as posicoes iniciais, monte 1 no primeiro e monte2 no segundo
+        monte1 = atual_mesa->cartas;
+        monte2 = monte1;
+        monte2 = monte2->prox;
+
+
         //marca como usados os naipes
         usado[(monte1->naipe) -1] = 1;
         usado[(monte2->naipe) -1] = 1;
@@ -109,6 +175,7 @@ void Baralho_2_mao(LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao){
     Carta->prox = *mao;
     *mao = Carta;
 }
+
 
 void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista){
     LISTA_CARTAS_PTR prev_mao = NULL;
@@ -466,18 +533,14 @@ LISTA_MESA_PTR duplicar_mesa (LISTA_MESA_PTR *lista_mesa){
         nova_mesa->y = atual_mesa->y;
 
         LISTA_CARTAS_PTR atual_cartas = atual_mesa->cartas;
-        printf("atual_cartas->naipe = %d\n", atual_cartas->naipe);
-        atual_cartas->naipe;
 
         LISTA_CARTAS_PTR nova_carta1 = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
 
         nova_carta1->naipe = atual_cartas->naipe;
-        printf("nova_carta1->naipe = %d\n", nova_carta1->naipe);
         nova_carta1->numero = atual_cartas->numero;
 
         nova_mesa->cartas = nova_carta1;
         atual_cartas = atual_cartas->prox;
-        LISTA_CARTAS_PTR nova_carta2 = NULL;
         while (atual_cartas != NULL){
             printf("6\n");
             nova_carta2 = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
@@ -523,6 +586,28 @@ LISTA_CARTAS_PTR duplicar_mao (LISTA_CARTAS_PTR *lista_cartas){
     nova_mao->prox = NULL;
 
 
+
+    return primeira_posicao;
+}
+
+JOGADORES_PTR criar_jogadores (int qtd_jogadores){
+    JOGADORES_PTR jog1 = NULL;
+    JOGADORES_PTR primeira_posicao = NULL;
+    for (int i=0; i<qtd_jogadores-1 && qtd_jogadores <= 6 && qtd_jogadores >=2; i++){ //nao pode ter mais de 6 jogadores
+        if (i == 0){ //se for o primeiro loop
+            jog1 = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+            primeira_posicao = jog1;
+            jog1->prox = NULL;
+            jog1->id = i;
+            jog1->cartas = NULL;
+        }
+        JOGADORES_PTR jog2 = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+        jog2->prox = primeira_posicao; //o ultimo jogador aponta para o primeiro, criando um loop
+        jog2->id = i+1;
+        jog2->cartas = NULL;
+        jog1->prox = jog2;
+        jog1 = jog1->prox;
+    }
 
     return primeira_posicao;
 }

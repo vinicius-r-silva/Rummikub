@@ -1,6 +1,9 @@
 #include <gtk/gtk.h>
 #include <string.h>  /* for css */
 
+#include "libs/data.h"
+#include "libs/system.h"
+
 GtkWidget *window;
 GtkWidget *fixed;
 
@@ -47,12 +50,15 @@ void constroi(){
 }
 
 void bt_img(){
-	g_print("OIII");
+  g_print("OIII");
   image = gtk_image_new_from_file("src/image/cartas/A@.png"); // put path to your image here
   gtk_fixed_put(GTK_FIXED(fixed), image, 0, 0);
   gtk_widget_show_all(window);
   gtk_widget_destroy((img_user5));
 }
+
+static LISTA_CARTAS_PTR Baralho;
+static JOGADORES_PTR Jogadores;
 
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
@@ -111,11 +117,22 @@ int main(int argc, char *argv[]) {
 
   constroi();
 
-  
+  Baralho = NULL;
+  Jogadores = NULL;
+  Cria_Baralho(&Baralho);
+  Jogadores = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+  Jogadores->Id = 0;
+  Jogadores->prox = NULL;
+  Jogadores->cartas = NULL;
+
+  int cont = 0;
+  for(cont = 0; cont < 14; cont++){
+    Baralho_2_mao(&Baralho, &(Jogadores->cartas));
+  }
+  Imprime_mao_jogador(&(Jogadores->cartas));
 
   gtk_main();
 
   //bt_img();
   return 0;
 }
-

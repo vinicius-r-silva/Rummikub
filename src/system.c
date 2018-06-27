@@ -499,3 +499,30 @@ LISTA_MESA_PTR duplicar_mesa (LISTA_MESA_PTR *lista_mesa){
     printf("8\n");
     return primeira_pos_mesa;
 }
+
+LISTA_CARTAS_PTR duplicar_mao (LISTA_CARTAS_PTR *lista_cartas){
+    LISTA_CARTAS_PTR atual_carta = *lista_cartas;
+    LISTA_CARTAS_PTR nova_mao = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
+    LISTA_CARTAS_PTR primeira_posicao = nova_mao;
+    nova_mao->naipe = atual_carta->naipe;
+    nova_mao->numero = atual_carta->numero;
+    nova_mao->prox = NULL;
+
+    atual_carta = atual_carta->prox;
+    while(atual_carta != NULL){
+        LISTA_CARTAS_PTR nova_mao2 = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
+        nova_mao2->naipe = atual_carta->naipe;
+        nova_mao2->numero = atual_carta->numero;
+        nova_mao->prox = nova_mao2;
+        nova_mao = nova_mao2;
+
+
+        atual_carta = atual_carta->prox;
+    }
+    //nova_mao aponta para o ultimo, logo o prox do ultimo deve ser NULL
+    nova_mao->prox = NULL;
+
+
+
+    return primeira_posicao;
+}

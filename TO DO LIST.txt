@@ -6,7 +6,6 @@ void TrocaCarta(LISTA_CARTAS_PTR *Baralho, int Naipe_1, int Naipe_2, int Num_1, 
 void Cria_Baralho(LISTA_CARTAS_PTR *Baralho);
 void Imprime(LISTA_CARTAS_PTR Baralho);
 void Imprime_Ordenado(LISTA_CARTAS_PTR Baralho);
-void verificar_mesa 
 -->imprimir_mao : é o void Imprime
 -->imprimir_mesa
 -->mao para mesa (Mandar os ponteiros da mao, o ponteiro do monte, a posição que será colocada no monte, naipe e numero)
@@ -32,9 +31,13 @@ colocar jogadores em loop
 FUNÇÕES
 -->duplicar mesa (para resetar caso a jogada, as "mexidas na mesa" tenham sido invalidas)
 -->verificar jogada inicial > 30 pontos
--->cortar monte
+--> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
+--> cortar monte (coloca a parte da direita em um novo monte no final da mesa)
 --> verificar fim do jogo
 --> colocar o coringa no verificar_mesa
+--> monte_2_monte
+--> void verificar_mesa (considerar o joker)
+
 
 
 

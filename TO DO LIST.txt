@@ -15,6 +15,8 @@ void int_2_naipe
 void int_2_hexa
 void hexa_2_int
 void baralho_para_jogador (LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao_jogador);
+--> duplicar_mao
+
 
 -----------------------------------------------------------------------------------------------------------
 DEBUGAR
@@ -33,7 +35,6 @@ FUNÇÕES
 -->cortar monte
 --> verificar fim do jogo
 --> colocar o coringa no verificar_mesa
---> duplicar_mao
 
 
 

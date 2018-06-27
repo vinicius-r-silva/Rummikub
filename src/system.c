@@ -611,3 +611,24 @@ JOGADORES_PTR criar_jogadores (int qtd_jogadores){
 
     return primeira_posicao;
 }
+
+
+void excluir_jogadores (JOGADORES_PTR *lista_jogadores){
+    JOGADORES_PTR jog1 = *lista_jogadores;
+    JOGADORES_PTR jog2 = *lista_jogadores;
+    jog2 = jog2->prox;
+    int qtd_jogadores = 1;
+    while(jog2->id != 0){
+        qtd_jogadores++;
+        jog2 = jog2->prox;
+    }
+    jog2 = jog2->prox;
+    for(int i=0; i<qtd_jogadores-2; i++){
+        free(jog1);
+        jog1 = jog2;
+        jog2 = jog2->prox;
+    }
+    free(jog1);
+    free(jog2);
+}
+

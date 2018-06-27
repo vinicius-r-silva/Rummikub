@@ -33,10 +33,10 @@ colocar jogadores em loop
 FUNÇÕES
 -->verificar jogada inicial > 30 pontos
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
---> cortar monte (coloca a parte da direita em um novo monte no final da mesa)
 --> verificar fim do jogo
---> monte_2_monte
 --> void verificar_mesa (considerar o joker)
+--> criar jogadores no inicio (informação pedida no inicio do programa)
+--> excluir (dar free)
 
 
 

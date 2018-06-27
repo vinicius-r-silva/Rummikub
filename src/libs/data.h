@@ -27,6 +27,7 @@ struct lista_mesa {
 };
 
 struct jogadores {
+    int Id;
     struct lista_cartas *cartas;
     struct jogadores *prox;
 };

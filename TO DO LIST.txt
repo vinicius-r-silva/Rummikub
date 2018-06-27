@@ -16,6 +16,8 @@ void hexa_2_int
 void baralho_para_jogador (LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao_jogador);
 --> duplicar_mao
 -->duplicar mesa (para resetar caso a jogada, as "mexidas na mesa" tenham sido invalidas)
+--> criar jogadores no inicio (informação pedida no inicio do programa)
+
 
 
 
@@ -35,7 +37,6 @@ FUNÇÕES
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
 --> verificar fim do jogo
 --> void verificar_mesa (considerar o joker)
---> criar jogadores no inicio (informação pedida no inicio do programa)
 --> excluir (dar free)
 
 

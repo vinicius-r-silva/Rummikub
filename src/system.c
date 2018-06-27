@@ -40,6 +40,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //se tiver menos de 3 cartas Ã© invÃ¡lido
         if (qtd_cartas < 3) return 0;
 
+
         monte1 = atual_mesa->cartas;   //reseta para a primera posiÃ§Ã£o do monte
         LISTA_CARTAS_PTR monte2 = atual_mesa->cartas;
         monte2 = monte2->prox;
@@ -51,9 +52,10 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //tipo 3: grupo com dois coringas e tres cartas, sem tipo nenhum, apenas e aceitavel
 
         //verificaÃ§Ã£o de uso do naipe, utilizado no case 2
-        int usado[4]; //[1, 2, 3, 4] 1-true, 0-false
+        int usado[5]; //[0, 1, 2, 3, 4] 1-true, 0-false
+        //nao usa a posicao 0
 
-        //seta todos para false
+        //setando todos para false
         for (int i=0; i<4; i++){
             usado[i] = 0;
         }
@@ -64,7 +66,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         se, e SOMENTE SE!! tiver algum joker fazer o seguinte:
         colocar as informações (numero) das struct num  vetor de structs
         ordenar e colocar o joker la no fim
-        depois disso proseguir o restante
+        depois disso proseguir para a verificacao de tipo
         **/
 
         int tipo = 0;
@@ -73,25 +75,25 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
 
         int qtd_joker = 0;
         while(monte_joker != NULL){
-            if (monte_joker->naipe == -1) qtd_joker++;
+            if (monte_joker->numero == INF) qtd_joker++;
             monte_joker = monte_joker->prox;
         }
-        if (qtd_joker == 2 && qtd_cartas == 3) tipo = 3;
-
-//        while (monte1->naipe == -1 || monte2->naipe == -1){
-//            monte1 = monte1->prox;
-//            monte2 = monte2->prox;
-//        }
+        if (qtd_joker == 2 && qtd_cartas == 3) {
+            tipo = 3;
+            break; //como e valido, passa para a proxima posicao da mesa
+        }
 
         /**ORDENACAO E VERIFICACAO DE TIPO OCORRE NO VETOR, CASO HAJA JOKER**/
         LISTA_CARTAS_PTR monte_aux = monte1;
-        if (qtd_joker > 0){
-            LISTA_CARTAS vetor[qtd_cartas];
-            for (int i=0; i<qtd_cartas; i++){
+        LISTA_CARTAS vetor[qtd_cartas];
+        //passar para o vetor
+        for (int i=0; i<qtd_cartas; i++){
                 (vetor[i]).numero = monte_aux->numero;
                 (vetor[i]).naipe = monte_aux->naipe;
                 monte_aux = monte_aux->prox;
             }
+        if (qtd_joker > 0 && tipo != 3){
+
             //ordenacao no bubble sort
             int troca = 1;
             while (troca == 1){
@@ -105,21 +107,14 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                     }
                 }
             }
-
-
-
-
-
-
-
         }
 
 
-        if (monte1->naipe == monte2->naipe && monte1->numero == ((monte2->numero) -1)) tipo = 1;
-        if (monte1->naipe != monte2->naipe && monte1->numero == monte2->numero) tipo = 2;
-        if (tipo == 0) return 0;
-
-
+        if (vetor[0].numero != vetor[1].numero){
+            tipo = 1;
+        } else {
+            tipo = 2;
+        }
         /**------FIM DA VERIFICACAO DE TIPO----------------------------**/
 
         //Assim que verificado o tipo, reseta para as posicoes iniciais, monte 1 no primeiro e monte2 no segundo
@@ -127,35 +122,114 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         monte2 = monte1;
         monte2 = monte2->prox;
 
+//--------------PASSAR AS INFORMACOES DAS STRUCTS PARA UM VETOR--------------------------------------------------
+        LISTA_CARTAS monte_clone[qtd_cartas];
+        monte_aux = monte1;
+        for (int i=0; i<qtd_cartas; i++){
+            monte_clone[i].numero = monte_aux->numero;
+            monte_clone[i].naipe = monte_aux->naipe;
+            monte_aux = monte_aux->prox;
+        }
+//-----------------------------------------------------------------------------------------------------------------
 
         //marca como usados os naipes
-        usado[(monte1->naipe) -1] = 1;
-        usado[(monte2->naipe) -1] = 1;
+       // usado[(monte1->naipe) -1] = 1;
+      //  usado[(monte2->naipe) -1] = 1;
 
 
-        //anda uma posiÃ§Ã£o em cada
-        monte1 = monte1->prox;
-        monte2 = monte2->prox;
-
-
+      //  //anda uma posiÃ§Ã£o em cada
+      //  monte1 = monte1->prox;
+      //  monte2 = monte2->prox;
+        int jokers_restante = -1;
         switch (tipo){
         case 1:
-            while (monte2 != NULL){
-                if (monte1->naipe != monte2->naipe || monte1->numero != ((monte2->numero) -1)) return 0;
-                monte1 = monte1->prox;
-                monte2 = monte2->prox;
+            //substituicao dos jokers
+            jokers_restante = qtd_joker;
+            for (int i=0; i<qtd_cartas-1; i++){
+                if (i == 0 && monte_clone[i].numero == INF){ //se o primeiro for joker
+                    jokers_restante--;
+                    if (monte_clone[1].numero == 1) return 0; //se o 1 for joker e o segundo for 1 nao vale
+                    if (monte_clone[i+1].numero == INF){ // se o segundo tambem for joker
+                        jokers_restante--;
+                        monte_clone[i].numero = monte_clone[i+2].numero - 2;
+                        monte_clone[i].naipe = monte_clone[i+2].naipe;
+                        monte_clone[i+1].numero = monte_clone[i+2].numero - 1;
+                        monte_clone[i+1].naipe = monte_clone[i+2].naipe;
+                    } else { //se o segundo nao for joker e o primeiro sim
+                        monte_clone[i].numero = monte_clone[i+1].numero - 1;
+                        monte_clone[i].naipe = monte_clone[i+1].naipe;
+                    }
+                }
+
+                if (monte_clone[i].numero == INF && jokers_restante > 0){
+                    jokers_restante--;
+                    monte_clone[i].numero = monte_clone[i-1].numero + 1;
+                    monte_clone[i].naipe = monte_clone[i-1].naipe;
+                }
             }
+            //falta verificar a ultima posicao, que nao foi vista no for
+            if (monte_clone[qtd_cartas-1].numero == INF && jokers_restante > 0){
+                jokers_restante--;
+                monte_clone[qtd_cartas-1].numero = monte_clone[qtd_cartas-2].numero + 1; //substitui o joker pelo valor correto
+                monte_clone[qtd_cartas-1].naipe = monte_clone[qtd_cartas-2].naipe;
+            }
+            //verificacao com os jokers substituidos
+            for (int i=0; i<qtd_cartas-1; i++){
+                if ((monte_clone[i].numero != (monte_clone[i+1].numero - 1)) || (monte_clone[i].naipe != monte_clone[i+1].naipe)) return 0;
+            }
+
+
         break;
 
         case 2:
-            while (monte2 != NULL){
-                if (usado[(monte2->naipe) -1] == 1) return 0;
-                usado[(monte1->naipe) -1] = 1;
-                usado[(monte2->naipe) -1] = 1;
-                if (monte1->naipe == monte2->naipe || monte1->numero != monte2->numero) return 0;
-                monte1 = monte1->prox;
-                monte2 = monte2->prox;
+            //substituicao dos jokers
+            jokers_restante = qtd_joker;
+            for (int i=0; i<qtd_cartas-1; i++){
+                if (monte_clone[i].numero == INF && i == 0){ //se a primeira carta for joker
+                    jokers_restante--;
+                    if (monte_clone[i+1].numero == INF){//se a segunda tambem for joker
+                        jokers_restante--;
+                        monte_clone[i].numero = monte_clone[i+2].numero;
+                        monte_clone[i+1].numero = monte_clone[i+2].numero;
+                        monte_clone[i].naipe = monte_clone[i+2].naipe;
+                        monte_clone[i+1].naipe = monte_clone[i+2].naipe;
+                    } else { //se so a primeira for joker
+                        monte_clone[i].numero = monte_clone[i+1].numero;
+                        monte_clone[i].naipe = monte_clone[i+1].naipe;
+                    }
+                }
+
+                if (monte_clone[i].numero == INF && jokers_restante > 0){
+                    jokers_restante--;
+                    monte_clone[i].numero = monte_clone[i-1].numero;
+                    monte_clone[i].naipe = monte_clone[i-1].naipe;
+                }
             }
+            //se a ultima posicao for joker
+            if (monte_clone[qtd_cartas-1].numero == INF){
+                monte_clone[qtd_cartas-1].numero = monte_clone[qtd_cartas-2].numero;
+                monte_clone[qtd_cartas-1].naipe = monte_clone[qtd_cartas-2].naipe;
+            }
+
+
+            printf("1 naipe = %d; numero = %d\n", monte_clone[0].naipe, monte_clone[0].numero);
+            printf("2 naipe = %d; numero = %d\n", monte_clone[1].naipe, monte_clone[1].numero);
+            printf("3 naipe = %d; numero = %d\n", monte_clone[2].naipe, monte_clone[2].numero);
+            printf("4 naipe = %d; numero = %d\n", monte_clone[3].naipe, monte_clone[3].numero);
+
+            //verificacao com os jokers substituidos
+            for (int i=0; i<qtd_cartas-1; i++){
+                if (monte_clone[i].numero != monte_clone[i+1].numero) return 0;
+            }
+
+//            while (monte2_clone != NULL){
+  //              if (usado[(monte2_clone->naipe) -1] == 1) return 0;
+    //            usado[(monte1_clone->naipe) -1] = 1;
+      //          usado[(monte2_clone->naipe) -1] = 1;
+        //        if (monte1_clone->naipe == monte2_clone->naipe || monte1_clone->numero != monte2_clone->numero) return 0;
+          //      monte1_clone = monte1_clone->prox;
+            //    monte2_clone = monte2_clone->prox;
+
         break;
 
         default:
@@ -608,10 +682,8 @@ JOGADORES_PTR criar_jogadores (int qtd_jogadores){
         jog1->prox = jog2;
         jog1 = jog1->prox;
     }
-
     return primeira_posicao;
 }
-
 
 void excluir_jogadores (JOGADORES_PTR *lista_jogadores){
     JOGADORES_PTR jog1 = *lista_jogadores;
@@ -631,4 +703,3 @@ void excluir_jogadores (JOGADORES_PTR *lista_jogadores){
     free(jog1);
     free(jog2);
 }
-

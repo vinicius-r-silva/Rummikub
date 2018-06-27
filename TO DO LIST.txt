@@ -38,11 +38,4 @@ FUNÇÕES
 -->verificar jogada inicial > 30 pontos
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
 --> verificar fim do jogo
---> void verificar_mesa (considerar o joker)
-
-
-
-
-
-
-
+--> void verificar_mesa (considerar os naipes ja usados para o tipo 2)

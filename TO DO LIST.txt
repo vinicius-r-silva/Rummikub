@@ -31,7 +31,9 @@ FUNÇÕES
 -->duplicar mesa (para resetar caso a jogada, as "mexidas na mesa" tenham sido invalidas)
 -->verificar jogada inicial > 30 pontos
 -->cortar monte
--->verificar fim do jogo
+--> verificar fim do jogo
+--> colocar o coringa no verificar_mesa
+--> duplicar_mao
 
 
 

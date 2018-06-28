@@ -20,6 +20,9 @@
 #define INICIO_X_MAO 122
 #define INICIO_Y_MAO 425
 
+#define SCREEN_SIZE_X 1000
+#define SCREEN_SIZE_Y 563
+
 
 struct lista_cartas {
     int naipe; //se for coringa = -1

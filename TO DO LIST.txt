@@ -34,9 +34,6 @@ DEBUGAR
 FALTA
 
 OUTROS
-colocar jogadores em loop
-
-
 
 FUNÇÕES
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)

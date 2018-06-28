@@ -1,7 +1,7 @@
 window {
   /*background-color: #ff00ff;*/
   /*background-image: url(¨teste.jpg¨);*/
-  background-image: url("image/bg.png");
+  background-image: url("../src/image/bg.png");
   background-size: cover;
   background-position: center;
 }
@@ -9,29 +9,29 @@ button{
 	border: 0;
 }
 #bt_compra_carta{
-	background-image: url("image/bt_comprar.png");
+	background-image: url("../src/image/bt_comprar.png");
 	background-repeat: no-repeat;
 	border: 0;
 }
 #bt_compra_carta:hover{
-	background-image: url("image/bt_comprar_hover.png");
+	background-image: url("../src/image/bt_comprar_hover.png");
 	border: 0;
 }
 #bt_compra_carta:active{
-	background-image: url("image/bt_comprar_foco.png");
+	background-image: url("../src/image/bt_comprar_foco.png");
 }
 .bt_compra_carta_db{
-	background-image: url("image/bt_comprar_disabilitado.png") !important;
+	background-image: url("../src/image/bt_comprar_disabilitado.png");
 }
 #bt_finaliza_jog{
-	background-image: url("image/bt_finalizar.png");
+	background-image: url("../src/image/bt_finalizar.png");
 	background-repeat: no-repeat;
 	border: 0;
 }
 #bt_finaliza_jog:hover{
-	background-image: url("image/bt_finalizar_hover.png");
+	background-image: url("../src/image/bt_finalizar_hover.png");
 	border: 0;
 }
 #bt_finaliza_jog:active{
-	background-image: url("image/bt_finalizar_foco.png");
+	background-image: url("../src/image/bt_finalizar_foco.png");
 }

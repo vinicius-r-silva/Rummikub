@@ -112,8 +112,7 @@ int main(int argc, char *argv[]) {
   gtk_window_set_title(GTK_WINDOW(window), "Rummikub");
   gtk_window_set_default_size(GTK_WINDOW(window), 1000, 563);
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-  
-
+  gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
 
   fixed = gtk_fixed_new();

@@ -56,7 +56,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //nao usa a posicao 0
 
         //setando todos para false
-        for (int i=0; i<4; i++){
+        for (int i=0; i<5; i++){
             usado[i] = 0;
         }
 
@@ -131,6 +131,11 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
             monte_aux = monte_aux->prox;
         }
 //-----------------------------------------------------------------------------------------------------------------
+
+        for (int i=0; i< qtd_cartas; i++){
+            if (monte_clone[i].naipe != INF) usado[monte_clone[i].naipe] = 1;
+        }
+
 
         //marca como usados os naipes
        // usado[(monte1->naipe) -1] = 1;
@@ -210,12 +215,6 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                 monte_clone[qtd_cartas-1].numero = monte_clone[qtd_cartas-2].numero;
                 monte_clone[qtd_cartas-1].naipe = monte_clone[qtd_cartas-2].naipe;
             }
-
-
-            printf("1 naipe = %d; numero = %d\n", monte_clone[0].naipe, monte_clone[0].numero);
-            printf("2 naipe = %d; numero = %d\n", monte_clone[1].naipe, monte_clone[1].numero);
-            printf("3 naipe = %d; numero = %d\n", monte_clone[2].naipe, monte_clone[2].numero);
-            printf("4 naipe = %d; numero = %d\n", monte_clone[3].naipe, monte_clone[3].numero);
 
             //verificacao com os jokers substituidos
             for (int i=0; i<qtd_cartas-1; i++){
@@ -703,3 +702,44 @@ void excluir_jogadores (JOGADORES_PTR *lista_jogadores){
     free(jog1);
     free(jog2);
 }
+
+//pega dois ponteiros de mesas, a antes da modificacao e a apos, ja supoe que sao validas e subtrai os pontos, se for maior que 30 ok
+//0: invalido; 1:valido
+int valida_jogada_inicial (LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nova){
+    int pont_mesa1 = 0;
+    int pont_mesa2 = 0;
+    //soma os pontos da mesa
+    LISTA_MESA_PTR m_backup = *mesa_backup;
+    LISTA_MESA_PTR m_nova = *mesa_nova;
+    LISTA_CARTAS_PTR atual_cartas = NULL;
+
+
+    //mesa 1
+    while (m_backup != NULL){
+        atual_cartas = m_backup->cartas;
+        while(atual_cartas != NULL){
+            pont_mesa1 += atual_cartas->numero;
+            atual_cartas = atual_cartas->prox;
+        }
+        m_backup = m_backup->prox;
+    }
+
+    //mesa 2
+    while (m_nova != NULL){
+        atual_cartas = m_nova->cartas;
+        while(atual_cartas != NULL){
+            pont_mesa2 += atual_cartas->numero;
+            atual_cartas = atual_cartas->prox;
+        }
+        m_nova = m_nova->prox;
+    }
+
+    //subtrai e ve a validade
+    int diferenca = pont_mesa2 - pont_mesa1;
+    if (diferenca >= 30){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+

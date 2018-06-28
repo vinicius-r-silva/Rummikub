@@ -25,12 +25,68 @@ GtkWidget *img_user4_foco;
 GtkWidget *img_user5_foco;
 
 GtkWidget *img_mao;
+int prev_X = 0;
+int prev_Y = 0;
+GdkDevice *mouse;
 
 /*---- CSS ------------------*/
 GtkCssProvider *provider;
 GdkDisplay *display;
 GdkScreen *screen;
 /*---------------------------*/
+
+
+//////////MOUSE////////////////////////
+void clique_mouse(GtkWidget *event_box,GdkEventButton *event,gpointer data){
+  gint x,y;
+  gdk_device_get_position (mouse, NULL, &x, &y);
+  prev_X = x;
+  prev_Y = y;
+
+}
+void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
+  int img_X, img_Y;
+  gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_X, &img_Y);
+
+  img_X += descola_X;
+  img_Y += descola_Y;
+
+  if (img_X < 1){
+    img_X = 1;
+  }
+  else if(img_X > SCREEN_SIZE_X-TAM_X_CARTA){
+    img_X = SCREEN_SIZE_X-TAM_X_CARTA;
+  }
+
+  if (img_Y < 1){
+    img_Y = 1;
+  }
+  else if(img_Y > SCREEN_SIZE_Y-TAM_Y_CARTA){
+    img_Y = SCREEN_SIZE_Y-TAM_Y_CARTA;
+  }
+  gtk_fixed_move (GTK_FIXED(fixed),image,img_X,img_Y);
+
+}
+static gboolean mouse_moved(GtkWidget *widget,GdkEventMotion *event, gpointer user_data) {
+    if (event->state & GDK_BUTTON1_MASK) {
+        gint x, y;
+        gdk_device_get_position (mouse, NULL, &x, &y);
+        g_print("Coordinates: (%u,%u)\n", x,y);
+        move_imagem(widget,x-prev_X,y-prev_Y);
+    prev_X = x;
+    prev_Y = y;
+    }
+    return 1;
+}
+void init_mouse(){
+  GdkSeat * seat;
+  GdkDisplay *display;
+  display = gdk_display_get_default();
+  seat = gdk_display_get_default_seat (display);
+  //device_manager = gdk_display_get_device_manager (display);
+  mouse = gdk_seat_get_pointer (seat);
+}
+//////////MOUSE////////////////////////
 
 void css_add(){
     provider = gtk_css_provider_new ();
@@ -49,20 +105,27 @@ void constroi(){
     gtk_widget_show_all(window);
 }
 
-void bt_img(){
-  g_print("OIII");
-  image = gtk_image_new_from_file("src/image/cartas/A@.png"); // put path to your image here
-  gtk_fixed_put(GTK_FIXED(fixed), image, 0, 0);
-  gtk_widget_show_all(window);
-  gtk_widget_destroy((img_user5));
+void bt_desabilita_compra(){
+  GtkStyleContext *context;
+  context = gtk_widget_get_style_context(bt_compra_carta);
+  gtk_style_context_add_class(context,"bt_compra_carta_db");
+}
+
+void troca_bt_jogador(){
+ 
 }
 
 static LISTA_CARTAS_PTR Baralho;
 static JOGADORES_PTR Jogadores;
 
+gboolean focus_out(GtkWidget *widget, GdkEvent  *event,gpointer   user_data){
+  g_print("SAIU");
+  return 1;
+}
 
 void gerar_mao(int Naipe, int val, int x, int y){
   GtkWidget *img_carta;
+  GtkWidget *event_box;
 
   char V = int_2_hexa(val);
   char N = Int_2_Naipe(Naipe);
@@ -76,9 +139,17 @@ void gerar_mao(int Naipe, int val, int x, int y){
   sprintf(Nome,"%c%c",V,N);
   Nome[2] = '\0';
 
+  event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(fixed), event_box,x, y);
+
   img_carta = gtk_image_new_from_file(resultado);
   gtk_widget_set_name(img_carta, Nome);
-  gtk_fixed_put(GTK_FIXED(fixed), img_carta,x, y);
+  //gtk_fixed_put(GTK_FIXED(fixed), img_carta,x, y);
+  gtk_container_add(GTK_CONTAINER(event_box), img_carta);
+
+  g_signal_connect (G_OBJECT(event_box),"button_press_event",G_CALLBACK(clique_mouse), NULL);
+  g_signal_connect (G_OBJECT(event_box),"motion_notify_event",G_CALLBACK(mouse_moved), NULL);
+  g_signal_connect (G_OBJECT(event_box), "button-release-event",G_CALLBACK(focus_out), NULL);
 
 }
 
@@ -93,9 +164,9 @@ void Imprime_mao_jogador(LISTA_CARTAS_PTR *Lista_Mao){
     	gerar_mao(Naipe, Valor, x, y);
     }
 }
+void atualiza_carta(int Naipe, int Valor, int x, int y){
 
-
-
+}
 void Imprime(LISTA_CARTAS_PTR Lista_Carta){
     while(Lista_Carta != NULL){
         g_print("%d | %d\n", Lista_Carta->numero, Lista_Carta->naipe);
@@ -104,9 +175,9 @@ void Imprime(LISTA_CARTAS_PTR Lista_Carta){
     g_print("\n\n\n");
 }
 
-
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
+  init_mouse();
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Rummikub");
@@ -118,17 +189,28 @@ int main(int argc, char *argv[]) {
   fixed = gtk_fixed_new();
   gtk_container_add(GTK_CONTAINER(window), fixed);
 
+  ///////////////////////////////////////////////////////////////////////////////
 
   bt_compra_carta = gtk_button_new_with_label("");
   gtk_fixed_put(GTK_FIXED(fixed), bt_compra_carta, 20,420);
   gtk_widget_set_size_request(bt_compra_carta, 88, 60);
   gtk_widget_set_name(bt_compra_carta,"bt_compra_carta");
 
+  GtkStyleContext *context_bt1 = gtk_widget_get_style_context(bt_compra_carta);
+  gtk_style_context_add_class(context_bt1,"bt_compra_carta");
 
   bt_finaliza_jog = gtk_button_new_with_label("");
-  gtk_fixed_put(GTK_FIXED(fixed), bt_finaliza_jog, 20,488);
-  gtk_widget_set_size_request(bt_finaliza_jog, 88, 60);
+  gtk_fixed_put(GTK_FIXED(fixed), bt_finaliza_jog, 20,485);
+  gtk_widget_set_size_request(bt_finaliza_jog, 88, 65);
   gtk_widget_set_name(bt_finaliza_jog,"bt_finaliza_jog");
+
+  GtkStyleContext *context_bt2 = gtk_widget_get_style_context(bt_finaliza_jog);
+  gtk_style_context_add_class(context_bt2,"bt_finaliza_jog");
+
+  ////////////////////////////////////////////////////////////////////////////
+
+  g_signal_connect (G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(bt_desabilita), NULL);
+
 
   img_mesa = gtk_image_new_from_file("src/image/mesa.png"); 
   gtk_fixed_put(GTK_FIXED(fixed), img_mesa,120, 15);
@@ -151,19 +233,12 @@ int main(int argc, char *argv[]) {
   img_user5 = gtk_image_new_from_file("src/image/user5.png"); 
   gtk_fixed_put(GTK_FIXED(fixed), img_user5, 20, 335);
 
-  //FUNCAO QUE REMOVE ELEMNTO AQUIIII 
-
-
-
-  g_signal_connect(G_OBJECT(bt_compra_carta),"clicked", G_CALLBACK(bt_img), NULL);
-
   css_add();
 
 
   Baralho = NULL;
   Jogadores = NULL;
   Cria_Baralho(&Baralho);	
-
 
   Jogadores = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
   Jogadores->Id = 0;

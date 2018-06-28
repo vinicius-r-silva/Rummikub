@@ -38,4 +38,6 @@ colocar jogadores em loop
 FUNÇÕES
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
 --> verificar fim do jogo
+--> vencedor
 --> void verificar_mesa (considerar os naipes ja usados para o tipo 2)
+--> 

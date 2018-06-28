@@ -187,6 +187,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         break;
 
         case 2:
+            if (qtd_cartas < 3 || qtd_cartas > 4) return 0;
             //substituicao dos jokers
             jokers_restante = qtd_joker;
             for (int i=0; i<qtd_cartas-1; i++){
@@ -196,29 +197,30 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                         jokers_restante--;
                         monte_clone[i].numero = monte_clone[i+2].numero;
                         monte_clone[i+1].numero = monte_clone[i+2].numero;
-                        monte_clone[i].naipe = monte_clone[i+2].naipe;
-                        monte_clone[i+1].naipe = monte_clone[i+2].naipe;
                     } else { //se so a primeira for joker
                         monte_clone[i].numero = monte_clone[i+1].numero;
-                        monte_clone[i].naipe = monte_clone[i+1].naipe;
                     }
                 }
 
                 if (monte_clone[i].numero == INF && jokers_restante > 0){
                     jokers_restante--;
                     monte_clone[i].numero = monte_clone[i-1].numero;
-                    monte_clone[i].naipe = monte_clone[i-1].naipe;
                 }
             }
             //se a ultima posicao for joker
             if (monte_clone[qtd_cartas-1].numero == INF){
                 monte_clone[qtd_cartas-1].numero = monte_clone[qtd_cartas-2].numero;
-                monte_clone[qtd_cartas-1].naipe = monte_clone[qtd_cartas-2].naipe;
             }
 
             //verificacao com os jokers substituidos
             for (int i=0; i<qtd_cartas-1; i++){
-                if (monte_clone[i].numero != monte_clone[i+1].numero) return 0;
+                for (int j=i+1; j<qtd_cartas; j++){
+                    if (monte_clone[i].numero != monte_clone[j].numero || (monte_clone[i].naipe == monte_clone[j].naipe)){
+                        if (monte_clone[i].naipe != INF && monte_clone[j].naipe != INF){ //se algum deles for joker, esta permitido ter naipe diferente
+                            return 0;
+                        }
+                    }
+                }
             }
 
 //            while (monte2_clone != NULL){

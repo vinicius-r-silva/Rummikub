@@ -21,21 +21,12 @@ void baralho_para_jogador (LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao_joga
 -->verificar jogada inicial > 30 pontos
 --> verificar fim do jogo
 --> vencedor
-
-
-
-
-
-
+--> void verificar_mesa (considerar os naipes ja usados para o tipo 2)
 -----------------------------------------------------------------------------------------------------------
 DEBUGAR
 
 -----------------------------------------------------------------------------------------------------------
-FALTA
-
-OUTROS
+FALTAM
 
 FUNÇÕES
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
---> void verificar_mesa (considerar os naipes ja usados para o tipo 2)
---> 

@@ -19,6 +19,9 @@ void baralho_para_jogador (LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao_joga
 --> criar jogadores no inicio (informação pedida no inicio do programa)
 --> excluir (dar free)
 -->verificar jogada inicial > 30 pontos
+--> verificar fim do jogo
+--> vencedor
+
 
 
 
@@ -37,7 +40,5 @@ colocar jogadores em loop
 
 FUNÇÕES
 --> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
---> verificar fim do jogo
---> vencedor
 --> void verificar_mesa (considerar os naipes ja usados para o tipo 2)
 --> 

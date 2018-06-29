@@ -92,8 +92,14 @@ void troca_bt_jogador(){
 }
 
 static LISTA_CARTAS_PTR Baralho;
-static JOGADORES_PTR Jogadores;
 
+void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
+  LISTA_CARTAS_PTR atual = Jogador->cartas;
+  while(atual != NULL){
+    gtk_widget_set_child_visible(atual->img, 0);
+    atual = atual->prox;
+  }
+}
 
 void atualiza_carta(GtkWidget *img, int x, int y){
   gtk_fixed_move (GTK_FIXED(fixed), img, x, y);
@@ -163,7 +169,9 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
     return;
   
   Tira_Borda_Jogador(atual);
+  Oculta_mao_Jogador(atual);
   Coloca_Borda_Jogador(atual->prox);
+  Imprime_mao_jogador(&(atual->prox->cartas));
   return;
 }
 
@@ -206,6 +214,25 @@ void cria_jogo_imagens(){
   gtk_fixed_put(GTK_FIXED(fixed), img_mao,120, 420);
 }
 
+void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores){
+  JOGADORES_PTR atual = *Lista_Jogadores;
+  int cont;
+  int prev_id = 0;
+
+  for(cont = 0; cont < 14; cont++){
+    Baralho_2_mao(&Baralho, &(atual->cartas));
+  }
+  atual = atual->prox;
+
+  while(prev_id < atual->Id){
+    for(cont = 0; cont < 14; cont++){
+      Baralho_2_mao(&Baralho, &(atual->cartas));
+    }
+    prev_id = atual->Id;
+    atual = atual->prox;
+  }
+}
+
 
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);//pega endereços dos parametros
@@ -230,36 +257,20 @@ int main(int argc, char *argv[]) {
   carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
   ///////////////////////////////////////////////////////////////////////////////
 
-
-
-
-  printf("1\n");
-
   Baralho = NULL;
-  Jogadores = NULL;
-  Init_Baralho(&Baralho, fixed);	
-  printf("2\n");
-
-  Jogadores = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
-  Jogadores->Id = 0;
-  Jogadores->prox = NULL;
-  Jogadores->cartas = NULL;
-  //Imprime(Baralho);
-
-  printf("3\n\n");
-
-  int cont = 0;
-  for(cont = 0; cont < 58; cont++){
-    Baralho_2_mao(&Baralho, &(Jogadores->cartas));
-  }
-
-  Imprime(Jogadores->cartas);
-  Imprime_mao_jogador(&(Jogadores->cartas));
+  Init_Baralho(&Baralho, fixed);
 
   Lista_Jogadores = NULL;
   criar_jogadores(&Lista_Jogadores, 3);
   printf("\n\nJogadores:\n");
+
   Imprime_Jodagores(Lista_Jogadores);
+
+  cria_mao_jogadores(&Lista_Jogadores);
+
+  Imprime(Lista_Jogadores->cartas);
+  Imprime_mao_jogador(&(Lista_Jogadores->cartas));
+
 
 
   constroi_janela_jogo(); //carrega funções do GTK para criar a janela

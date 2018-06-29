@@ -35,6 +35,14 @@ GdkDisplay *display;
 GdkScreen *screen;
 /*---------------------------*/
 
+//Cria o icone na janela
+GdkPixbuf *create_pixbuf(const gchar * filename) {
+  GdkPixbuf *pixbuf;
+  GError *error = NULL;
+  pixbuf = gdk_pixbuf_new_from_file(filename, &error);
+  if (!pixbuf) {  fprintf(stderr, "%s\n", error->message);g_error_free(error);}
+  return pixbuf;
+}
 
 //////////MOUSE////////////////////////
 void clique_mouse(GtkWidget *event_box,GdkEventButton *event,gpointer data){
@@ -88,7 +96,7 @@ void init_mouse(){
 }
 //////////MOUSE////////////////////////
 
-void css_add(){
+void carrega_estilo_jogo(){
     provider = gtk_css_provider_new ();
     display = gdk_display_get_default ();
     screen = gdk_display_get_default_screen (display);
@@ -96,23 +104,27 @@ void css_add(){
     const gchar* home = "glade/style.css";
     GError *error = 0;
     gtk_css_provider_load_from_file(provider, g_file_new_for_path(home), &error);
-    g_object_unref (provider);
+    g_object_unref(provider);
 }
 
-void constroi(){
-    g_signal_connect(G_OBJECT(window), "destroy", 
-    G_CALLBACK(gtk_main_quit), NULL);
-    gtk_widget_show_all(window);
+//Constroi janela - funções do GTK
+void constroi_janela_jogo(){
+  g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+  gtk_widget_show_all(window);
 }
 
+//Desabilita botão de comprar carta
 void bt_desabilita_compra(){
   GtkStyleContext *context;
   context = gtk_widget_get_style_context(bt_compra_carta);
   gtk_style_context_add_class(context,"bt_compra_carta_db");
 }
 
+//Altera botão nova jogada para iniciar outro jogador
 void troca_bt_jogador(){
- 
+  GtkStyleContext *context;
+  context = gtk_widget_get_style_context(bt_finaliza_jog);
+  gtk_style_context_add_class(context,"bt_novo_jogador");
 }
 
 static LISTA_CARTAS_PTR Baralho;
@@ -164,9 +176,7 @@ void Imprime_mao_jogador(LISTA_CARTAS_PTR *Lista_Mao){
     	gerar_mao(Naipe, Valor, x, y);
     }
 }
-void atualiza_carta(int Naipe, int Valor, int x, int y){
 
-}
 void Imprime(LISTA_CARTAS_PTR Lista_Carta){
     while(Lista_Carta != NULL){
         g_print("%d | %d\n", Lista_Carta->numero, Lista_Carta->naipe);
@@ -174,51 +184,54 @@ void Imprime(LISTA_CARTAS_PTR Lista_Carta){
     }
     g_print("\n\n\n");
 }
+//
+void comprar_cartas_user(){
+  g_print("-> Apertou comprar cartas\n");
+  return;
+}
+//
+void finaliza_jogada_user(){
+  g_print("-> Apertou finalizar jogada\n");
+  return;
+}
 
-int main(int argc, char *argv[]) {
-  gtk_init(&argc, &argv);
-  init_mouse();
-
-  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "Rummikub");
-  gtk_window_set_default_size(GTK_WINDOW(window), 1000, 563);
-  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-  gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-
-
-  fixed = gtk_fixed_new();
-  gtk_container_add(GTK_CONTAINER(window), fixed);
-
-  ///////////////////////////////////////////////////////////////////////////////
-
+//Adiciona botões no jogo e seus eventos
+void cria_botoes_jogo(){
+  //Cria botão de COMPRA CARTAS
   bt_compra_carta = gtk_button_new_with_label("");
   gtk_fixed_put(GTK_FIXED(fixed), bt_compra_carta, 20,420);
   gtk_widget_set_size_request(bt_compra_carta, 88, 60);
   gtk_widget_set_name(bt_compra_carta,"bt_compra_carta");
-
+  
+  //Adiciona a class para o botão COMPRA CARTAS
   GtkStyleContext *context_bt1 = gtk_widget_get_style_context(bt_compra_carta);
   gtk_style_context_add_class(context_bt1,"bt_compra_carta");
+    
+  //Evento que realiza COMPRA CARTAS para o usuario
+  g_signal_connect(G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(comprar_cartas_user), NULL); 
 
+  //Cria botão de FINALIZAR JOGADA
   bt_finaliza_jog = gtk_button_new_with_label("");
   gtk_fixed_put(GTK_FIXED(fixed), bt_finaliza_jog, 20,485);
   gtk_widget_set_size_request(bt_finaliza_jog, 88, 65);
   gtk_widget_set_name(bt_finaliza_jog,"bt_finaliza_jog");
-
+  
   GtkStyleContext *context_bt2 = gtk_widget_get_style_context(bt_finaliza_jog);
   gtk_style_context_add_class(context_bt2,"bt_finaliza_jog");
+  
+  //Evento que realiza FINALIZAR JOGADA para o usuario
+  g_signal_connect(G_OBJECT(bt_finaliza_jog),"button_press_event",G_CALLBACK(finaliza_jogada_user), NULL); 
+}
 
-  ////////////////////////////////////////////////////////////////////////////
-
-  g_signal_connect (G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(bt_desabilita), NULL);
-
-
+//Função para criar imagens do jogo
+void cria_jogo_imagens(){
   img_mesa = gtk_image_new_from_file("src/image/mesa.png"); 
   gtk_fixed_put(GTK_FIXED(fixed), img_mesa,120, 15);
 
   img_mao = gtk_image_new_from_file("src/image/mao.png"); 
   gtk_fixed_put(GTK_FIXED(fixed), img_mao,120, 420);
 
-  img_user1 = gtk_image_new_from_file("src/image/user1_foco.png"); 
+  img_user1 = gtk_image_new_from_file("src/image/user1_foco.png"); //primeiro jogados começa com foco. (Borda azul)
   gtk_fixed_put(GTK_FIXED(fixed), img_user1,20, 15);
 
   img_user2 = gtk_image_new_from_file("src/image/user2.png"); 
@@ -232,9 +245,30 @@ int main(int argc, char *argv[]) {
 
   img_user5 = gtk_image_new_from_file("src/image/user5.png"); 
   gtk_fixed_put(GTK_FIXED(fixed), img_user5, 20, 335);
+}
 
-  css_add();
+int main(int argc, char *argv[]) {
+  gtk_init(&argc, &argv); //pega endereços dos parametros
+  init_mouse();
+  
+  //cria janela do windows
+  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title(GTK_WINDOW(window), "Rummikub.c");
+  gtk_window_set_default_size(GTK_WINDOW(window), 1000, 563);
+  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+  gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
+  GdkPixbuf *icon = create_pixbuf("src/image/icon.png");  
+  gtk_window_set_icon(GTK_WINDOW(window), icon);
+  
+  
+  //Cria CONTAINER no windows, onde serão criados os objetos
+  fixed = gtk_fixed_new();
+  gtk_container_add(GTK_CONTAINER(window), fixed);
+  
+  cria_botoes_jogo(); //carrega botões no jogo
+  cria_jogo_imagens(); //carrega imagens do jogo Ex: Mesa, img dos jogadores, fundo da mão do jogador
+  carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
 
   Baralho = NULL;
   Jogadores = NULL;
@@ -254,9 +288,9 @@ int main(int argc, char *argv[]) {
   Imprime(Jogadores->cartas);
   Imprime_mao_jogador(&(Jogadores->cartas));
 
-  constroi();
-  gtk_main();
+  constroi_janela_jogo(); //carrega funções do GTK para criar a janela
+  g_object_unref(icon);
+  gtk_main(); //cria janela 
 
-  //bt_img();
   return 0;
 }

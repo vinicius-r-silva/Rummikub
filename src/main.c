@@ -3,6 +3,9 @@
 
 #include "libs/data.h"
 #include "libs/system.h"
+#include "libs/eventos.h"
+
+GdkDevice *mouse;
 
 GtkWidget *window;
 GtkWidget *fixed;
@@ -25,9 +28,6 @@ GtkWidget *img_user4_foco;
 GtkWidget *img_user5_foco;
 
 GtkWidget *img_mao;
-int prev_X = 0;
-int prev_Y = 0;
-GdkDevice *mouse;
 
 /*---- CSS ------------------*/
 GtkCssProvider *provider;
@@ -35,49 +35,6 @@ GdkDisplay *display;
 GdkScreen *screen;
 /*---------------------------*/
 
-
-//////////MOUSE////////////////////////
-void clique_mouse(GtkWidget *event_box,GdkEventButton *event,gpointer data){
-  gint x,y;
-  gdk_device_get_position (mouse, NULL, &x, &y);
-  prev_X = x;
-  prev_Y = y;
-
-}
-void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
-  int img_X, img_Y;
-  gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_X, &img_Y);
-
-  img_X += descola_X;
-  img_Y += descola_Y;
-
-  if (img_X < 1){
-    img_X = 1;
-  }
-  else if(img_X > SCREEN_SIZE_X-TAM_X_CARTA){
-    img_X = SCREEN_SIZE_X-TAM_X_CARTA;
-  }
-
-  if (img_Y < 1){
-    img_Y = 1;
-  }
-  else if(img_Y > SCREEN_SIZE_Y-TAM_Y_CARTA){
-    img_Y = SCREEN_SIZE_Y-TAM_Y_CARTA;
-  }
-  gtk_fixed_move (GTK_FIXED(fixed),image,img_X,img_Y);
-
-}
-static gboolean mouse_moved(GtkWidget *widget,GdkEventMotion *event, gpointer user_data) {
-    if (event->state & GDK_BUTTON1_MASK) {
-        gint x, y;
-        gdk_device_get_position (mouse, NULL, &x, &y);
-        g_print("Coordinates: (%u,%u)\n", x,y);
-        move_imagem(widget,x-prev_X,y-prev_Y);
-    prev_X = x;
-    prev_Y = y;
-    }
-    return 1;
-}
 void init_mouse(){
   GdkSeat * seat;
   GdkDisplay *display;
@@ -86,7 +43,8 @@ void init_mouse(){
   //device_manager = gdk_display_get_device_manager (display);
   mouse = gdk_seat_get_pointer (seat);
 }
-//////////MOUSE////////////////////////
+
+//////////MOUSE//////////////////////////////////MOUSE////////////////////////
 
 void css_add(){
     provider = gtk_css_provider_new ();
@@ -118,55 +76,26 @@ void troca_bt_jogador(){
 static LISTA_CARTAS_PTR Baralho;
 static JOGADORES_PTR Jogadores;
 
-gboolean focus_out(GtkWidget *widget, GdkEvent  *event,gpointer   user_data){
-  g_print("SAIU");
-  return 1;
-}
 
-void gerar_mao(int Naipe, int val, int x, int y){
-  GtkWidget *img_carta;
-  GtkWidget *event_box;
-
-  char V = int_2_hexa(val);
-  char N = Int_2_Naipe(Naipe);
-
-  char resultado[27]; memset(resultado, 0, sizeof(char)*27);
-  sprintf(resultado,"src/image/cartas/%c%c.png",V,N);
-  g_print("N: %2d, V: %2d, x: %2d, y: %2d, Res: %s\n", Naipe, val, x, y, resultado);
-
-
-  char Nome[3];
-  sprintf(Nome,"%c%c",V,N);
-  Nome[2] = '\0';
-
-  event_box = gtk_event_box_new();
-  gtk_fixed_put(GTK_FIXED(fixed), event_box,x, y);
-
-  img_carta = gtk_image_new_from_file(resultado);
-  gtk_widget_set_name(img_carta, Nome);
-  //gtk_fixed_put(GTK_FIXED(fixed), img_carta,x, y);
-  gtk_container_add(GTK_CONTAINER(event_box), img_carta);
-
-  g_signal_connect (G_OBJECT(event_box),"button_press_event",G_CALLBACK(clique_mouse), NULL);
-  g_signal_connect (G_OBJECT(event_box),"motion_notify_event",G_CALLBACK(mouse_moved), NULL);
-  g_signal_connect (G_OBJECT(event_box), "button-release-event",G_CALLBACK(focus_out), NULL);
-
+void atualiza_carta(GtkWidget *img, int x, int y){
+  gtk_fixed_move (GTK_FIXED(fixed), img, x, y);
 }
 
 void Imprime_mao_jogador(LISTA_CARTAS_PTR *Lista_Mao){
 	LISTA_CARTAS_PTR atual = *Lista_Mao;
-    int cont = 0;
-    int x = 0, y = 0;
-    int Naipe = 0, Valor = 0;
-    while(Cartas_Mao(&x, &y, &Naipe, &Valor, cont, atual)){
-    	cont++;
-    	//g_print("N: %d, V: %d, x: %d, y: %d\n", Naipe, Valor, x, y);
-    	gerar_mao(Naipe, Valor, x, y);
-    }
+  int cont = 0;
+  int x = 0, y = 0;
+  GtkWidget *Img;
+  while(Cartas_Mao(&x, &y, &Img, cont, atual)){
+    cont++;
+    atualiza_carta(Img, x, y);
+    //g_print("N: %d, V: %d, x: %d, y: %d\n", Naipe, Valor, x, y);
+    //gerar_mao(Naipe, Valor, x, y);
+  }
 }
-void atualiza_carta(int Naipe, int Valor, int x, int y){
 
-}
+
+
 void Imprime(LISTA_CARTAS_PTR Lista_Carta){
     while(Lista_Carta != NULL){
         g_print("%d | %d\n", Lista_Carta->numero, Lista_Carta->naipe);
@@ -209,7 +138,7 @@ int main(int argc, char *argv[]) {
 
   ////////////////////////////////////////////////////////////////////////////
 
-  g_signal_connect (G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(bt_desabilita), NULL);
+  //g_signal_connect (G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(bt_desabilita_compra), NULL);
 
 
   img_mesa = gtk_image_new_from_file("src/image/mesa.png"); 
@@ -236,15 +165,20 @@ int main(int argc, char *argv[]) {
   css_add();
 
 
+  printf("1\n");
+
   Baralho = NULL;
   Jogadores = NULL;
-  Cria_Baralho(&Baralho);	
+  Cria_Baralho(&Baralho, fixed);	
+  printf("2\n");
 
   Jogadores = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
   Jogadores->Id = 0;
   Jogadores->prox = NULL;
   Jogadores->cartas = NULL;
-  Imprime(Baralho);
+  //Imprime(Baralho);
+
+  printf("3\n");
 
   int cont = 0;
   for(cont = 0; cont < 14; cont++){

@@ -1,6 +1,8 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <gtk/gtk.h>
+
 #define NAIPE_1 '!' 
 #define NAIPE_2 '@'
 #define NAIPE_3 '#'
@@ -27,6 +29,7 @@
 struct lista_cartas {
     int naipe; //se for coringa = -1
     int numero;
+    GtkWidget *img;
     struct lista_cartas *prox;
 };
 

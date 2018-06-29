@@ -1,39 +1,5 @@
 #include "libs/system.h"
 
-GtkWidget* Insere_Img_Interface(int Naipe, int Valor, GtkWidget *Painel, char Interacao){
-  GtkWidget *img_carta;
-  GtkWidget *event_box;
-
-  char V = int_2_hexa(Valor);
-  char N = Int_2_Naipe(Naipe);
-
-  char resultado[27]; memset(resultado, 0, sizeof(char)*27);
-  sprintf(resultado,"src/image/cartas/%c%c.png",V,N);
-  //g_print("N: %2d (%c), V: %2d (%c)\n", Naipe, N, Valor, V);
-
-  char NomeCarta[6];
-  sprintf(NomeCarta,"%cC_%c%c",Interacao, V, N);
-  NomeCarta[5] = '\0';
-
-  char NomeEventBox[6];
-  sprintf(NomeEventBox,"%cE_%c%c",Interacao, V,N);
-  NomeEventBox[5] = '\0';
-
-  event_box = gtk_event_box_new();
-  gtk_fixed_put(GTK_FIXED(Painel), event_box,0, 0);
-  gtk_widget_set_child_visible(event_box, 0);
-  gtk_widget_set_name(event_box, NomeEventBox);
-
-  img_carta = gtk_image_new_from_file(resultado);
-  gtk_widget_set_name(img_carta, NomeCarta);
-  gtk_container_add(GTK_CONTAINER(event_box), img_carta);
-
-  g_signal_connect (G_OBJECT(event_box),"button_press_event",G_CALLBACK(clique_mouse), NULL);
-  g_signal_connect (G_OBJECT(event_box),"motion_notify_event",G_CALLBACK(mouse_moved), NULL);
-  g_signal_connect (G_OBJECT(event_box), "button-release-event",G_CALLBACK(focus_out), NULL);
-  return event_box;
-}
-
 void Cria_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, GtkWidget *Painel, char Interacao){
     if (Naipe > 4 || Numero > 13)
         return;
@@ -42,7 +8,7 @@ void Cria_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, GtkWidget *Pai
     nova->naipe = Naipe;
     nova->numero = Numero;
     nova->prox = *Baralho;
-    nova->img = Insere_Img_Interface(Naipe, Numero, Painel, Interacao);
+    nova->img = Insere_Carta_Interface(Naipe, Numero, Painel, Interacao);
     *Baralho = nova;
 }
 
@@ -190,4 +156,66 @@ char Int_2_Naipe(int Naipe){
         default:
             return -1;
     }
+}
+
+void excluir_jogadores (JOGADORES_PTR *Lista_Jogadores){
+    JOGADORES_PTR atual = *Lista_Jogadores;
+    JOGADORES_PTR prev = NULL;
+    if(atual == NULL)
+        return;
+
+    prev = atual;
+    atual = atual->prox;
+    prev->prox = NULL;
+
+    LISTA_CARTAS_PTR Prev_Mao = NULL;
+    LISTA_CARTAS_PTR Atual_Mao = NULL;
+
+    while(atual != NULL){
+        prev = atual;
+        atual = atual->prox;
+
+        Prev_Mao = NULL;
+        Atual_Mao = prev->cartas;
+        while(Atual_Mao != NULL){
+            Prev_Mao = Atual_Mao;
+            Atual_Mao = Atual_Mao->prox;
+            free(Prev_Mao);
+        }
+        free(prev);
+    }
+    *Lista_Jogadores = NULL;
+}
+
+void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd){
+    excluir_jogadores(Lista_Jogadores);
+    if(Qtd == 0)
+        return;
+
+    int i = 0;
+    JOGADORES_PTR prev = NULL;
+    JOGADORES_PTR atual = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+    *Lista_Jogadores = atual;
+
+    atual->Id = i;
+    atual->Sua_Vez = 1;
+    atual->prox = NULL;
+    atual->cartas = NULL;
+    atual->Jogada_Inicial = 1;
+    Insere_Img_Jogador(atual);
+
+    for (i = 1; i < Qtd && i < 5; i++){ //nao pode ter mais de 5 jogadores
+        prev = atual;
+
+        atual = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
+        atual->Id = i;
+        atual->Sua_Vez = 0;
+        atual->cartas = NULL;
+        atual->Jogada_Inicial = 1;
+        Insere_Img_Jogador(atual);
+
+        prev->prox = atual;
+    }
+    atual->prox = *Lista_Jogadores;
+    return;
 }

@@ -16,10 +16,10 @@
 #define TAM_X_CARTA 28
 #define TAM_Y_CARTA 50
 
-#define TAM_X_ESPACO 2
+#define TAM_X_ESPACO 3
 #define TAM_Y_ESPACO 14
 
-#define INICIO_X_MAO 140
+#define INICIO_X_MAO 129
 #define INICIO_Y_MAO 425
 
 #define SCREEN_SIZE_X 1060
@@ -29,8 +29,11 @@
 #define INICIO_Y_MESA 30
 
 #define FIM_X_MESA    1020
-#define INICIO_X_MESA 140
+#define INICIO_X_MESA 129
 
+#define INICIO_X_JOGADORES 20
+#define INICIO_Y_JOGADORES 15
+#define ESPACO_Y_JOGADORES 80
 
 struct lista_cartas {
     int naipe; //se for coringa = -1
@@ -49,6 +52,9 @@ struct lista_mesa {
 
 struct jogadores {
     int Id;
+    char Sua_Vez;
+    GtkWidget *img;
+    char Jogada_Inicial;
     struct lista_cartas *cartas;
     struct jogadores *prox;
 };

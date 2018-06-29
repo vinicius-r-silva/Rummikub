@@ -12,10 +12,12 @@
 #include "eventos.h"
 
 
-void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel);
+void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel, int Interacao);
 void Baralho_2_mao(LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao);
 int Cartas_Mao(int *x, int *y, GtkWidget **Img, int pos, LISTA_CARTAS_PTR atual);
 char Int_2_Naipe(int Naipe);
 char int_2_hexa(int Numero);
+void Grid_2_Pixel(int linha, int coluna, int *x, int *y, int Inicio_x, int Inicio_y);
+void Init_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel);
 
 #endif //SYSTEM_H

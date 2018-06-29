@@ -1,6 +1,6 @@
 #include "libs/system.h"
 
-GtkWidget* Insere_Img_Interface(int Naipe, int Valor, GtkWidget *Painel){
+GtkWidget* Insere_Img_Interface(int Naipe, int Valor, GtkWidget *Painel, char Interacao){
   GtkWidget *img_carta;
   GtkWidget *event_box;
 
@@ -11,16 +11,21 @@ GtkWidget* Insere_Img_Interface(int Naipe, int Valor, GtkWidget *Painel){
   sprintf(resultado,"src/image/cartas/%c%c.png",V,N);
   //g_print("N: %2d (%c), V: %2d (%c)\n", Naipe, N, Valor, V);
 
-  char Nome[3];
-  sprintf(Nome,"%c%c",V,N);
-  Nome[2] = '\0';
+  char NomeCarta[6];
+  sprintf(NomeCarta,"%cC_%c%c",Interacao, V, N);
+  NomeCarta[5] = '\0';
+
+  char NomeEventBox[6];
+  sprintf(NomeEventBox,"%cE_%c%c",Interacao, V,N);
+  NomeEventBox[5] = '\0';
 
   event_box = gtk_event_box_new();
   gtk_fixed_put(GTK_FIXED(Painel), event_box,0, 0);
-  //gtk_widget_set_child_visible(event_box, 0);
+  gtk_widget_set_child_visible(event_box, 0);
+  gtk_widget_set_name(event_box, NomeEventBox);
 
   img_carta = gtk_image_new_from_file(resultado);
-  gtk_widget_set_name(img_carta, Nome);
+  gtk_widget_set_name(img_carta, NomeCarta);
   gtk_container_add(GTK_CONTAINER(event_box), img_carta);
 
   g_signal_connect (G_OBJECT(event_box),"button_press_event",G_CALLBACK(clique_mouse), NULL);
@@ -29,7 +34,7 @@ GtkWidget* Insere_Img_Interface(int Naipe, int Valor, GtkWidget *Painel){
   return event_box;
 }
 
-void Cria_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, GtkWidget *Painel){
+void Cria_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, GtkWidget *Painel, char Interacao){
     if (Naipe > 4 || Numero > 13)
         return;
 
@@ -37,7 +42,7 @@ void Cria_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, GtkWidget *Pai
     nova->naipe = Naipe;
     nova->numero = Numero;
     nova->prox = *Baralho;
-    nova->img = Insere_Img_Interface(Naipe, Numero, Painel);
+    nova->img = Insere_Img_Interface(Naipe, Numero, Painel, Interacao);
     *Baralho = nova;
 }
 
@@ -65,10 +70,10 @@ void TrocaCarta(LISTA_CARTAS_PTR *Baralho, int Naipe_1, int Naipe_2, int Num_1, 
         printf("Erro: Carta 1 não  encontrada\n");
 
     if(Carta2 != NULL){
+        Img2 = Carta2->img;
         Carta2->img = Img1;
         Carta2->numero = Num_1;
         Carta2->naipe = Naipe_1;
-        Img2 = Carta2->img;
     }else
         printf("Erro: Carta 2 não encontrada\n");
 
@@ -76,28 +81,37 @@ void TrocaCarta(LISTA_CARTAS_PTR *Baralho, int Naipe_1, int Naipe_2, int Num_1, 
         Carta1->img = Img2;
 }
 
+void Init_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
+    LISTA_CARTAS_PTR Baralho1 = NULL;
+    LISTA_CARTAS_PTR Baralho2 = NULL;
 
-void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
-    bool Recursiva = (*Baralho == NULL) ? 1 : 0;
+    Cria_Baralho(&Baralho1, Painel, '1');
+    Cria_Baralho(&Baralho2, Painel, '2');
 
+    LISTA_CARTAS_PTR atual = Baralho1;
+    while(atual->prox != NULL)
+        atual = atual->prox;
+
+    atual->prox = Baralho2;
+    *Baralho = Baralho1;
+}
+
+void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel, int Interacao){
     srand(time(NULL));
     int Numero, Naipe;
     for(Naipe = 1; Naipe < 5; Naipe++){
         for(Numero = 1; Numero < 14; Numero++){
-            Cria_Carta(Baralho, Naipe, Numero, Painel);
+            Cria_Carta(Baralho, Naipe, Numero, Painel, Interacao);
         }
     }
-    Cria_Carta(Baralho, -1, -1, Painel);
+    Cria_Carta(Baralho, -1, -1, Painel, Interacao);
 
     for(Naipe = 1; Naipe < 5; Naipe++){
         for(Numero = 1; Numero < 14; Numero++){
             TrocaCarta(Baralho, Naipe, rand() % 4 + 1 ,Numero, rand() % 13 + 1);
         }
     }
-    TrocaCarta(Baralho, -1, rand() % 4 + 1 , -1, rand() % 13 + 1);
-
-    if(Recursiva)
-        Cria_Baralho(Baralho, Painel);
+    //TrocaCarta(Baralho, -1, rand() % 4 + 1 , -1, rand() % 13 + 1);
 }
 
 
@@ -109,6 +123,14 @@ void Baralho_2_mao(LISTA_CARTAS_PTR *baralho, LISTA_CARTAS_PTR *mao){
     *baralho = Carta->prox;
     Carta->prox = *mao;
     *mao = Carta;
+}
+
+void Grid_2_Pixel(int linha, int coluna, int *x, int *y, int Inicio_x, int Inicio_y){
+    *x = Inicio_x;
+    *y = Inicio_y;
+
+    *x += (TAM_X_CARTA + TAM_X_ESPACO) * coluna;
+    *y += (TAM_Y_CARTA + TAM_Y_ESPACO) * linha;
 }
 
 int Cartas_Mao(int *x, int *y, GtkWidget **Img, int pos, LISTA_CARTAS_PTR atual){

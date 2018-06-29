@@ -16,14 +16,20 @@
 #define TAM_X_CARTA 28
 #define TAM_Y_CARTA 50
 
-#define TAM_X_ESPACO 3
-#define TAM_Y_ESPACO 15
+#define TAM_X_ESPACO 2
+#define TAM_Y_ESPACO 14
 
-#define INICIO_X_MAO 122
+#define INICIO_X_MAO 140
 #define INICIO_Y_MAO 425
 
-#define SCREEN_SIZE_X 1000
+#define SCREEN_SIZE_X 1060
 #define SCREEN_SIZE_Y 563
+
+#define FIM_Y_MESA    385
+#define INICIO_Y_MESA 30
+
+#define FIM_X_MESA    1020
+#define INICIO_X_MESA 140
 
 
 struct lista_cartas {

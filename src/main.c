@@ -5,6 +5,8 @@
 #include "libs/system.h"
 #include "libs/eventos.h"
 
+//TODO: testar se as cartas na distribuicao da mao ultrapassam a limitacao da area da mao
+
 GdkDevice *mouse;
 
 GtkWidget *window;
@@ -81,16 +83,29 @@ void atualiza_carta(GtkWidget *img, int x, int y){
   gtk_fixed_move (GTK_FIXED(fixed), img, x, y);
 }
 
-void Imprime_mao_jogador(LISTA_CARTAS_PTR *Lista_Mao){
-	LISTA_CARTAS_PTR atual = *Lista_Mao;
-  int cont = 0;
-  int x = 0, y = 0;
+void Imprime_mao_jogador(LISTA_CARTAS_PTR *Mao){
+	LISTA_CARTAS_PTR atual = *Mao;
+  
   GtkWidget *Img;
-  while(Cartas_Mao(&x, &y, &Img, cont, atual)){
-    cont++;
-    atualiza_carta(Img, x, y);
-    //g_print("N: %d, V: %d, x: %d, y: %d\n", Naipe, Valor, x, y);
-    //gerar_mao(Naipe, Valor, x, y);
+  int linha = 0, coluna = 0;
+  int Pos_x = 0, Pos_y = 0;
+
+
+  while(atual != NULL){
+    Img = atual->img;
+    Grid_2_Pixel(linha, coluna, &Pos_x, &Pos_y, INICIO_X_MAO, INICIO_Y_MAO);
+
+    atualiza_carta(Img, Pos_x, Pos_y);
+    gtk_widget_set_child_visible(Img, 1);
+    g_print("%d - N: %s, x: %d, y: %d, N: %c, V: %c\n", coluna, gtk_widget_get_name(Img), Pos_x, Pos_y, Int_2_Naipe(atual->naipe), int_2_hexa(atual->numero));
+
+    atual = atual->prox;
+
+    coluna++;
+    if(coluna > N_MAX_COLUNAS){
+      coluna = 0;
+      linha++;
+    }
   }
 }
 
@@ -110,7 +125,7 @@ int main(int argc, char *argv[]) {
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(window), "Rummikub");
-  gtk_window_set_default_size(GTK_WINDOW(window), 1000, 563);
+  gtk_window_set_default_size(GTK_WINDOW(window), SCREEN_SIZE_X, SCREEN_SIZE_Y);
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
   gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
@@ -169,7 +184,7 @@ int main(int argc, char *argv[]) {
 
   Baralho = NULL;
   Jogadores = NULL;
-  Cria_Baralho(&Baralho, fixed);	
+  Init_Baralho(&Baralho, fixed);	
   printf("2\n");
 
   Jogadores = (JOGADORES_PTR)malloc(sizeof(JOGADORES));
@@ -178,12 +193,13 @@ int main(int argc, char *argv[]) {
   Jogadores->cartas = NULL;
   //Imprime(Baralho);
 
-  printf("3\n");
+  printf("3\n\n");
 
   int cont = 0;
-  for(cont = 0; cont < 14; cont++){
+  for(cont = 0; cont < 60; cont++){
     Baralho_2_mao(&Baralho, &(Jogadores->cartas));
   }
+  printf("4\n\n");
 
   Imprime(Jogadores->cartas);
   Imprime_mao_jogador(&(Jogadores->cartas));

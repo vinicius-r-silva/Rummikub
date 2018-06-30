@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
   tela_home(Baralho, &Lista_Jogadores);
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
   g_object_unref(icon);
+
   gtk_main(); //cria janela 
 
   excluir_jogadores(&Lista_Jogadores);

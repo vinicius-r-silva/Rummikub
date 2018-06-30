@@ -177,6 +177,7 @@ void tela_erro_jogada(){
 
   //Evento fecha janela
   g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_tela), tela_erro_jogada); 
+  atualiza_janela();
 }
 
 
@@ -205,6 +206,7 @@ void tela_ganhador(int jogador){
 
   //Evento fecha janela
   g_signal_connect(G_OBJECT(bt_final),"button_press_event",G_CALLBACK(fecha_tela),tela_ganha); 
+  atualiza_janela();
 }
 
 
@@ -229,3 +231,4 @@ void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
     atual = atual->prox;
   }
 }
+

@@ -37,21 +37,21 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
             qtd_cartas++;
             monte1 = monte1->prox;
         }
-        //se tiver menos de 3 cartas Ã© invÃ¡lido
+        //se tiver menos de 3 cartas sera invalido
         if (qtd_cartas < 3) return 0;
 
 
-        monte1 = atual_mesa->cartas;   //reseta para a primera posiÃ§Ã£o do monte
+        monte1 = atual_mesa->cartas;   //reseta para a primera posicao do monte
         LISTA_CARTAS_PTR monte2 = atual_mesa->cartas;
         monte2 = monte2->prox;
 
         //identifica o tipo de monte
-        //tipo 0: invÃ¡lido
+        //tipo 0: invalido
         //tipo 1: sequencia de naipe igual
         //tipo 2: grupo (cartas de numeros iguais de naipes diferentes)
         //tipo 3: grupo com dois coringas e tres cartas, sem tipo nenhum, apenas e aceitavel
 
-        //verificaÃ§Ã£o de uso do naipe, utilizado no case 2
+        //verificao de uso do naipe, utilizado no case 2
         int usado[5]; //[0, 1, 2, 3, 4] 1-true, 0-false
         //nao usa a posicao 0
 
@@ -63,10 +63,10 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
 
         /**----------VERIFICACAO DE TIPO-----------------------**/
         /**
-        se, e SOMENTE SE!! tiver algum joker fazer o seguinte:
-        colocar as informações (numero) das struct num  vetor de structs
-        ordenar e colocar o joker la no fim
-        depois disso proseguir para a verificacao de tipo
+        Se, e SOMENTE SE houver algum joker fazer o seguinte:
+        Colocar as informações das structs num  vetor de structs
+        Ordenar e colocar o joker la no fim
+        Proseguir para a verificacao de tipo
         **/
 
         int tipo = 0;
@@ -122,29 +122,21 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         monte2 = monte1;
         monte2 = monte2->prox;
 
-//--------------PASSAR AS INFORMACOES DAS STRUCTS PARA UM VETOR--------------------------------------------------
-        LISTA_CARTAS monte_clone[qtd_cartas];
+        //--------------PASSAR AS INFORMACOES DAS STRUCTS PARA UM VETOR-------------//
+        LISTA_CARTAS monte_clone[qtd_cartas]; //clone do monte de cartas
         monte_aux = monte1;
         for (int i=0; i<qtd_cartas; i++){
             monte_clone[i].numero = monte_aux->numero;
             monte_clone[i].naipe = monte_aux->naipe;
             monte_aux = monte_aux->prox;
         }
-//-----------------------------------------------------------------------------------------------------------------
+       //----------------------------------------------------------------------------//
 
         for (int i=0; i< qtd_cartas; i++){
             if (monte_clone[i].naipe != INF) usado[monte_clone[i].naipe] = 1;
         }
 
 
-        //marca como usados os naipes
-       // usado[(monte1->naipe) -1] = 1;
-      //  usado[(monte2->naipe) -1] = 1;
-
-
-      //  //anda uma posiÃ§Ã£o em cada
-      //  monte1 = monte1->prox;
-      //  monte2 = monte2->prox;
         int jokers_restante = -1;
         switch (tipo){
         case 1:
@@ -172,7 +164,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                     monte_clone[i].naipe = monte_clone[i-1].naipe;
                 }
             }
-            //falta verificar a ultima posicao, que nao foi vista no for
+            //verificar a ultima posicao, que nao foi vista no for
             if (monte_clone[qtd_cartas-1].numero == INF && jokers_restante > 0){
                 jokers_restante--;
                 monte_clone[qtd_cartas-1].numero = monte_clone[qtd_cartas-2].numero + 1; //substitui o joker pelo valor correto
@@ -222,14 +214,6 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                     }
                 }
             }
-
-//            while (monte2_clone != NULL){
-  //              if (usado[(monte2_clone->naipe) -1] == 1) return 0;
-    //            usado[(monte1_clone->naipe) -1] = 1;
-      //          usado[(monte2_clone->naipe) -1] = 1;
-        //        if (monte1_clone->naipe == monte2_clone->naipe || monte1_clone->numero != monte2_clone->numero) return 0;
-          //      monte1_clone = monte1_clone->prox;
-            //    monte2_clone = monte2_clone->prox;
 
         break;
 

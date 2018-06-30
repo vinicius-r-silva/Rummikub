@@ -37,7 +37,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
             qtd_cartas++;
             monte1 = monte1->prox;
         }
-        //se tiver menos de 3 cartas sera invalido
+        //se tiver menos de 3 cartas Ã© invÃ¡lido
         if (qtd_cartas < 3) return 0;
 
 
@@ -51,7 +51,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //tipo 2: grupo (cartas de numeros iguais de naipes diferentes)
         //tipo 3: grupo com dois coringas e tres cartas, sem tipo nenhum, apenas e aceitavel
 
-        //verificao de uso do naipe, utilizado no case 2
+        //verificacao de uso do naipe, utilizado no case 2
         int usado[5]; //[0, 1, 2, 3, 4] 1-true, 0-false
         //nao usa a posicao 0
 
@@ -63,10 +63,10 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
 
         /**----------VERIFICACAO DE TIPO-----------------------**/
         /**
-        Se, e SOMENTE SE houver algum joker fazer o seguinte:
-        Colocar as informações das structs num  vetor de structs
-        Ordenar e colocar o joker la no fim
-        Proseguir para a verificacao de tipo
+        se, e SOMENTE SE!! tiver algum joker fazer o seguinte:
+        colocar as informações (numero) das struct num  vetor de structs
+        ordenar e colocar o joker la no fim
+        depois disso proseguir para a verificacao de tipo
         **/
 
         int tipo = 0;
@@ -122,20 +122,19 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         monte2 = monte1;
         monte2 = monte2->prox;
 
-        //--------------PASSAR AS INFORMACOES DAS STRUCTS PARA UM VETOR-------------//
-        LISTA_CARTAS monte_clone[qtd_cartas]; //clone do monte de cartas
+//--------------PASSAR AS INFORMACOES DAS STRUCTS PARA UM VETOR--------------------------------------------------
+        LISTA_CARTAS monte_clone[qtd_cartas];
         monte_aux = monte1;
         for (int i=0; i<qtd_cartas; i++){
             monte_clone[i].numero = monte_aux->numero;
             monte_clone[i].naipe = monte_aux->naipe;
             monte_aux = monte_aux->prox;
         }
-       //----------------------------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------------------
 
         for (int i=0; i< qtd_cartas; i++){
             if (monte_clone[i].naipe != INF) usado[monte_clone[i].naipe] = 1;
         }
-
 
         int jokers_restante = -1;
         switch (tipo){
@@ -164,7 +163,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                     monte_clone[i].naipe = monte_clone[i-1].naipe;
                 }
             }
-            //verificar a ultima posicao, que nao foi vista no for
+            //falta verificar a ultima posicao, que nao foi vista no for
             if (monte_clone[qtd_cartas-1].numero == INF && jokers_restante > 0){
                 jokers_restante--;
                 monte_clone[qtd_cartas-1].numero = monte_clone[qtd_cartas-2].numero + 1; //substitui o joker pelo valor correto
@@ -214,7 +213,6 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
                     }
                 }
             }
-
         break;
 
         default:
@@ -691,6 +689,7 @@ void excluir_jogadores (JOGADORES_PTR *lista_jogadores){
 
 //pega dois ponteiros de mesas, a antes da modificacao e a apos, ja supoe que sao validas e subtrai os pontos, se for maior que 30 ok
 //0: invalido; 1:valido
+/**---------------------OBSERVAÇÃO: A FUNÇÃO SUPÕE QUE A MESA É VALIDA-------------------------**/
 int valida_jogada_inicial (LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nova){
     int pont_mesa1 = 0;
     int pont_mesa2 = 0;
@@ -704,8 +703,13 @@ int valida_jogada_inicial (LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nov
     while (m_backup != NULL){
         atual_cartas = m_backup->cartas;
         while(atual_cartas != NULL){
-            pont_mesa1 += atual_cartas->numero;
-            atual_cartas = atual_cartas->prox;
+            if (atual_cartas->numero == INF){
+                pont_mesa1 += 20;
+                atual_cartas = atual_cartas->prox;
+            } else {
+                pont_mesa1 += atual_cartas->numero;
+                atual_cartas = atual_cartas->prox;
+            }
         }
         m_backup = m_backup->prox;
     }
@@ -714,14 +718,20 @@ int valida_jogada_inicial (LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nov
     while (m_nova != NULL){
         atual_cartas = m_nova->cartas;
         while(atual_cartas != NULL){
-            pont_mesa2 += atual_cartas->numero;
-            atual_cartas = atual_cartas->prox;
+            if (atual_cartas->numero == INF){
+                pont_mesa2 += 20;
+                atual_cartas = atual_cartas->prox;
+            } else {
+                pont_mesa2 += atual_cartas->numero;
+                atual_cartas = atual_cartas->prox;
+            }
         }
         m_nova = m_nova->prox;
     }
 
+    printf("pontos mesa 1: %d, mesa 2: %d\n", pont_mesa1, pont_mesa2);
     //subtrai e ve a validade
-    int diferenca = pont_mesa2 - pont_mesa1;
+    int diferenca = abs(pont_mesa2 - pont_mesa1);
     if (diferenca >= 30){
         return 1;
     } else {

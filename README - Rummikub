@@ -1,0 +1,25 @@
+Grupo:
+P = ?: Mateus Fernandes Doimo - 10691971
+P = ?: Gabriel Santos Nicolau - 10684600
+P = ?: Vinícius Ribeiro da Silva - 10828141
+
+Este projeto visa construir o jogo Rummikub na linguagem C para a disciplina de Introdução à Ciência da Computação da Universidade de São Paulo. As regras originais do jogo foram implementadas no programa. Além disso foi utilizada a biblioteca Gtk para a criação da interface gráfica.
+
+COMPILAÇÃO
+* Linux (Obs.: Deve-se conter o GCC instalado) : Acesse a pasta onde estão localizados os arquivos fonte pelo terminal >> execute os comandos:
+$ gcc -c -g -O0 -Wall -pthread -pipe src/main.c `pkg-config --cflags --libs gtk+-3.0` -o main.o
+$ gcc -c -g -O0 -Wall -pthread -pipe src/system.c `pkg-config --cflags --libs gtk+-3.0` -o system.o
+$ gcc -c -g -O0 -Wall -pthread -pipe src/eventos.c `pkg-config --cflags --libs gtk+-3.0` -o eventos.o
+$ gcc -c -g -O0 -Wall -pthread -pipe src/interface.c `pkg-config --cflags --libs gtk+-3.0` -o interface.o
+$ gcc -o template_app  main.o system.o eventos.o interface.o -pthread `pkg-config --cflags --libs gtk+-3.0` -export-dynamic
+
+EXECUÇÃO
+* Linux: Navegue pelo terminal e acesse a pasta do arquivo compilado >> Execute o comando:
+$ ./rummikub
+
+
+  
+
+ 
+
+

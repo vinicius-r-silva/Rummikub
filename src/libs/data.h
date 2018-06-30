@@ -2,12 +2,15 @@
 #define DATA_H
 
 #include <gtk/gtk.h>
+#include <limits.h>
 
 #define NAIPE_1 '!' 
 #define NAIPE_2 '@'
 #define NAIPE_3 '#'
 #define NAIPE_4 '$'
 #define CORINGA '*'
+
+#define JOKER (INT_MAX)
 
 #define LOCAL_FILE_BARALHO "rummikub/baralho.txt"
 
@@ -36,7 +39,7 @@
 #define ESPACO_Y_JOGADORES 80
 
 struct lista_cartas {
-    int naipe; //se for coringa = -1
+    int naipe; //se for coringa == JOKER
     int numero;
     GtkWidget *img;
     struct lista_cartas *prox;

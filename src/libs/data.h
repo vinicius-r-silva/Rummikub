@@ -66,6 +66,7 @@ struct bt_jog{
   GtkWidget *n_5;
   GtkWidget *obj_home;
   int bt_ativo;
+  struct lista_cartas *Baralho;
 };
 
 typedef struct bt_jog LISTA_BT_JOG;

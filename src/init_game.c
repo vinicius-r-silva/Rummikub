@@ -3,22 +3,11 @@
 
 extern GtkWidget *fixed;
 extern GdkDevice *mouse;
-extern GtkWidget *window;
-extern JOGADORES_PTR Lista_Jogadores;
-
-extern GtkWidget *bt_compra_carta;
-extern GtkWidget *bt_finaliza_jog;
-
-/*---- CSS ------------------*/
-GtkCssProvider *provider;
-GdkDisplay *display;
-GdkScreen *screen;
-/*---------------------------*/
 
 void carrega_estilo_jogo(){
-    provider = gtk_css_provider_new ();
-    display = gdk_display_get_default ();
-    screen = gdk_display_get_default_screen (display);
+    GtkCssProvider *provider = gtk_css_provider_new ();
+    GdkDisplay *display = gdk_display_get_default ();
+    GdkScreen *screen = gdk_display_get_default_screen (display);
     gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER (provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     const gchar* home = "glade/style.css";
     GError *error = 0;
@@ -44,7 +33,7 @@ void init_mouse(){
   mouse = gdk_seat_get_pointer (seat);
 }
 
-void tela_home(LISTA_CARTAS_PTR Baralho){
+void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR Lista_Jogadores){
   GtkWidget *home = gtk_fixed_new();
   gtk_fixed_put(GTK_FIXED(fixed), home, 0, 0);
 
@@ -96,6 +85,7 @@ void tela_home(LISTA_CARTAS_PTR Baralho){
   bts_n_jog->bt_ativo = 0;
   bts_n_jog->obj_home = home;
   bts_n_jog->Baralho = Baralho;
+  bts_n_jog->Lista_Jogadores = Lista_Jogadores;
 
   //
   g_signal_connect(G_OBJECT(n_jogador2),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog); 
@@ -108,6 +98,8 @@ void tela_home(LISTA_CARTAS_PTR Baralho){
 
 void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
   g_print("\n\n%d\n\n",data->bt_ativo);
+  JOGADORES_PTR Lista_Jogadores = data->Lista_Jogadores;
+
   if(data->bt_ativo > 1){
     gtk_widget_destroy((data->obj_home));
 
@@ -162,13 +154,13 @@ void ativa_n_jog(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
 }
 
 //Constroi janela - funções do GTK
-void constroi_janela_jogo(){
+void constroi_janela_jogo(GtkWidget *window){
     g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_widget_show_all(window);
 }
 
 //Adiciona botões no jogo e seus eventos
-void cria_botoes_jogo(){
+void cria_botoes_jogo(GtkWidget *bt_compra_carta, GtkWidget *bt_finaliza_jog){
   //Cria botão de COMPRA CARTAS
   bt_compra_carta = gtk_button_new_with_label("");
   gtk_fixed_put(GTK_FIXED(fixed), bt_compra_carta, 20,420);

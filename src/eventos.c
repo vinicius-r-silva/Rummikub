@@ -48,28 +48,37 @@ void imprime_mesa(LISTA_MESA_PTR *Lista_Mesas){
 gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   int linha = 0, coluna = 0;
   int img_x = 0, img_y = 0;
+  g_print("1\n");
+  if(Lista_Jogadores == NULL)
+    g_print("ListaJogadores é null\n");
   JOGADORES_PTR Jogador =  Jogador_Atual(&Lista_Jogadores);
 
+  g_print("2\n");
   gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_x, &img_y);
   if(img_y > FIM_Y_MESA - TAM_Y_CARTA/2){
     Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
     return 1;
   }
   
+  g_print("3\n");
   Pixel_2_LinCol(&linha, &coluna, img_x, img_y);
 
+  g_print("4\n");
   int pos = 0;
   LISTA_MESA_PTR Monte = NULL;
   LinCol_2_Monte(&Monte, &Mesa, &pos, linha, coluna);
 
+  g_print("5\n");
   int Naipe, Numero;
   int Nova_Lista = (pos == -1) ? 1 : 0;
   EventBox_2_Carta(image, &Naipe, &Numero);
 
+  g_print("6\n");
   mao_2_monte(&(Jogador->cartas), &Monte, Naipe, Numero, pos, Nova_Lista);
   if(Mesa == NULL)
      Mesa = Monte;
 
+  g_print("7\n");
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   Organiza_Mesa(&Mesa);
   atualiza_cartas_mesa(&Mesa);

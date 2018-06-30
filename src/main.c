@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   fixed = gtk_fixed_new();
   gtk_container_add(GTK_CONTAINER(window), fixed);
 
-  cria_botoes_jogo(); //carrega botões no jogo
+  cria_botoes_jogo(bt_compra_carta, bt_finaliza_jog); //carrega botões no jogo
   cria_jogo_imagens(); //carrega imagens do jogo Ex: Mesa, img dos jogadores, fundo da mão do jogador
   carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
   ///////////////////////////////////////////////////////////////////////////////
@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
   Init_Baralho(&Baralho, fixed);
   Lista_Jogadores = NULL;
 
-  tela_home(Baralho);
-  constroi_janela_jogo(); //carrega funções do GTK para criar a janela
+  tela_home(Baralho, Lista_Jogadores);
+  constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
   g_object_unref(icon);
   gtk_main(); //cria janela 
 

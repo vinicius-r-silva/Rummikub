@@ -222,7 +222,6 @@ void troca_bt_jogador(){
   gtk_style_context_add_class(context,"bt_novo_jogador");
 }
 
-
 void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
   LISTA_CARTAS_PTR atual = Jogador->cartas;
   while(atual != NULL){

@@ -50,7 +50,13 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   int linha = 0, coluna = 0;
   int img_x = 0, img_y = 0;
   g_print("1\n");
+  JOGADORES_PTR Jogador =  Jogador_Atual(&Lista_Jogadores);
+
   gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_x, &img_y);
+  if(img_y > FIM_Y_MESA - TAM_Y_CARTA/2){
+    Imprime_cartas(Jogador->cartas);
+    return 1;
+  }
   g_print("2\n");
   
   Pixel_2_LinCol(&linha, &coluna, img_x, img_y);
@@ -75,14 +81,10 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   EventBox_2_Carta(image, &Naipe, &Numero);
 
   g_print("Naipe: %d (%c), Valor: %d (%c)\n", Naipe, Int_2_Naipe(Naipe), Numero, int_2_hexa(Numero));
-  LISTA_CARTAS_PTR Mao_Jogador =  Mao_Jogador_Atual(&Lista_Jogadores);
-  g_print("Mao Jogador: \n");
-  Imprime_cartas(Mao_Jogador);
-  g_print("fim mao jogador\n\n");
 
-  mao_2_monte(&Mao_Jogador, &Monte, Naipe, Numero, pos, Nova_Lista);
+  mao_2_monte(&(Jogador->cartas), &Monte, Naipe, Numero, pos, Nova_Lista);
   if(Mesa == NULL)
-    Mesa = Monte;
+     Mesa = Monte;
 
   imprime_mesa(&Mesa);
 

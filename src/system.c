@@ -313,12 +313,12 @@ void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int l
         *Monte = prev;*/
 }
 
-LISTA_CARTAS_PTR Mao_Jogador_Atual(JOGADORES_PTR *Lista_Jogadores){
+JOGADORES_PTR Jogador_Atual(JOGADORES_PTR *Lista_Jogadores){
     JOGADORES_PTR atual = *Lista_Jogadores;
     while(!atual->Sua_Vez)
         atual = atual->prox;
     
-    return atual->cartas;
+    return atual;
 }
 
 void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista){

@@ -46,52 +46,55 @@ void imprime_mesa(LISTA_MESA_PTR *Lista_Mesas){
 
 
 gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
-  g_print("inicou focus out:\n");
   int linha = 0, coluna = 0;
   int img_x = 0, img_y = 0;
-  g_print("1\n");
   JOGADORES_PTR Jogador =  Jogador_Atual(&Lista_Jogadores);
 
   gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_x, &img_y);
   if(img_y > FIM_Y_MESA - TAM_Y_CARTA/2){
-    Imprime_cartas(Jogador->cartas);
+    Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
     return 1;
   }
-  g_print("2\n");
   
   Pixel_2_LinCol(&linha, &coluna, img_x, img_y);
-  g_print("3\n");
 
   int pos = 0;
   LISTA_MESA_PTR Monte = NULL;
   LinCol_2_Monte(&Monte, &Mesa, &pos, linha, coluna);
 
-  g_print("SAIU:\n");
-  g_print("Img: %d, %d\n", img_x, img_y);
-  g_print("lin: %d, col: %d\n", linha, coluna);
-  if(Monte == NULL)
-    g_print("Monte Vazio, pos: %d\n", pos);
-  else
-    g_print("Mx:  %d, My:  %d, Qtd_Carta: %d, pos; %d\n", Monte->x, Monte->y, Monte->N_Cartas, pos);
-
-  imprime_mesa(&Mesa);
-
   int Naipe, Numero;
   int Nova_Lista = (pos == -1) ? 1 : 0;
   EventBox_2_Carta(image, &Naipe, &Numero);
-
-  g_print("Naipe: %d (%c), Valor: %d (%c)\n", Naipe, Int_2_Naipe(Naipe), Numero, int_2_hexa(Numero));
 
   mao_2_monte(&(Jogador->cartas), &Monte, Naipe, Numero, pos, Nova_Lista);
   if(Mesa == NULL)
      Mesa = Monte;
 
-  imprime_mesa(&Mesa);
-
+  Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   Organiza_Mesa(&Mesa);
-  imprime_mesa(&Mesa);
   atualiza_cartas_mesa(&Mesa);
 
 
   return 1;
+}
+
+void comprar_cartas_user(GtkWidget *widget, gpointer data){
+  g_print("-> Apertou comprar cartas\n");
+  return;
+}
+
+void finaliza_jogada_user(GtkWidget *widget, gpointer data){
+  JOGADORES_PTR atual = Lista_Jogadores;
+  int cont = 0;
+  for (cont = 0; cont < 10 && !atual->Sua_Vez; cont++)
+    atual = atual->prox;
+  
+  if(cont == 10)
+    return;
+  
+  Tira_Borda_Jogador(atual);
+  Oculta_mao_Jogador(atual);
+  Coloca_Borda_Jogador(atual->prox);
+  Imprime_mao_jogador(&(atual->prox->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  return;
 }

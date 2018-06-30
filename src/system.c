@@ -261,12 +261,10 @@ void Pixel_2_LinCol(int *lin, int *col, int x, int y){
 }
 
 void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int linha, int coluna){
-    g_print("1\n");
     LISTA_MESA_PTR prev = NULL;
     LISTA_MESA_PTR Atual = *Mesa;
-    //g_print("Atual->y: %d, l: %d, c: %d\n", Atual->y, linha, coluna);
+    
     if(Atual == NULL || Atual->y > linha || (Atual->y == linha && Atual->x > coluna)){
-        g_print("Entrou\n");
         *Monte = *Mesa;
         *pos = -1;
         return;
@@ -297,20 +295,6 @@ void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int l
         *Monte = Atual;
     else    
         *Monte = prev;
-
-    /*if (Atual != NULL && (Atual->y > linha || (Atual->y == linha && Atual->x != coluna)))
-        *pos = -1;
-    else if (prev != NULL && (prev->y > linha || prev->y != linha || ((prev->x + prev->N_Cartas+1) < coluna)))
-        *pos = -1;
-    else if (prev != NULL)
-        *pos = coluna - prev->x;
-    else
-        *pos = 0;
-
-    if(Atual != NULL && Atual->x == coluna)
-        *Monte = Atual;
-    else
-        *Monte = prev;*/
 }
 
 JOGADORES_PTR Jogador_Atual(JOGADORES_PTR *Lista_Jogadores){
@@ -342,7 +326,6 @@ void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Num
     LISTA_MESA_PTR Mesa_Atual;
 
     if(Nova_Lista){
-        g_print("10\n");
         LISTA_MESA_PTR Nova_mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
         Nova_mesa->x = 0;
         Nova_mesa->y = 0;
@@ -353,7 +336,6 @@ void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Num
         if(*mesa == NULL)
             *mesa = Nova_mesa;
         else{
-            g_print("11\n");
             Nova_mesa->prox = (*mesa)->prox;
             (*mesa)->prox = Nova_mesa;
         }
@@ -449,6 +431,23 @@ void EventBox_2_Carta(GtkWidget *EventBox, int *Naipe, int *Numero){
 
     *Numero = Hexa_2_int (nome[3]);
     *Naipe = Naipe_2_int (nome[4]);
+}
 
-    g_print("\n\nNome: %s, Na: %d (%c), Nu: %d (%c)\n\n", nome, *Naipe, nome[4], *Numero, nome[3]);
+void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR Baralho){
+  JOGADORES_PTR atual = *Lista_Jogadores;
+  int cont;
+  int prev_id = 0;
+
+  for(cont = 0; cont < 14; cont++){
+    Baralho_2_mao(&Baralho, &(atual->cartas));
+  }
+  atual = atual->prox;
+
+  while(prev_id < atual->Id){
+    for(cont = 0; cont < 14; cont++){
+      Baralho_2_mao(&Baralho, &(atual->cartas));
+    }
+    prev_id = atual->Id;
+    atual = atual->prox;
+  }
 }

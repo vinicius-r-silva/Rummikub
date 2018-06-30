@@ -2,6 +2,8 @@
 
 extern GtkWidget *fixed;
 extern GtkWidget *window;
+extern GtkWidget *bt_compra_carta;
+extern GtkWidget *bt_finaliza_jog;
 
 void atualiza_janela(){
   gtk_widget_show_all(window);
@@ -113,7 +115,6 @@ void Imprime_mao_jogador(LISTA_CARTAS_PTR *Mao, int linha, int coluna, int Pixel
 
     atualiza_carta(Img, Pos_x, Pos_y);
     gtk_widget_set_child_visible(Img, 1);
-    g_print("%d - N: %s, x: %d, y: %d, N: %c, V: %c\n", coluna, gtk_widget_get_name(Img), Pos_x, Pos_y, Int_2_Naipe(atual->naipe), int_2_hexa(atual->numero));
 
     atual = atual->prox;
 
@@ -130,6 +131,102 @@ void atualiza_cartas_mesa(LISTA_MESA_PTR *Lista_Mesas){
 
   while(atual != NULL){
     Imprime_mao_jogador(&(atual->cartas), atual->y, atual->x, INICIO_X_MESA, INICIO_Y_MESA);
+    atual = atual->prox;
+  }
+}
+
+void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
+  gtk_widget_destroy((callback_params));
+  return;
+}
+
+//Cria tela de bem vindo para os usuarios
+void tela_bem_vindo(){
+  GtkWidget *tela_inicial = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_inicial, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_inicial), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_bem_vindo");
+
+
+  GtkWidget *bt_pronto = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_inicial), bt_pronto,401, 315);
+  gtk_widget_set_size_request(bt_pronto, 258, 65);
+  gtk_widget_set_name(bt_pronto,"bt_pronto");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_tela), tela_inicial); 
+}
+
+//Cria tela de erro na mesa
+void tela_erro_jogada(){
+  GtkWidget *tela_erro_jogada = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_erro_jogada, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_erro_jogada), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_erro_jogada");
+
+  GtkWidget *bt_pronto = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_erro_jogada), bt_pronto,447, 355);
+  gtk_widget_set_size_request(bt_pronto, 166, 46);
+  gtk_widget_set_name(bt_pronto,"bt_ok");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_tela), tela_erro_jogada); 
+}
+
+
+//Cria tela ganhador do jogo
+void tela_ganhador(int jogador){
+  GtkWidget *tela_ganha = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_ganha, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_ganha), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_ganha");
+
+  char resultado[30]; memset(resultado, 0, sizeof(char)*27);
+  sprintf(resultado,"img_jogador_%d",jogador);
+
+  GtkWidget *img_jogador = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_ganha), img_jogador,370,210);
+  gtk_widget_set_size_request(img_jogador, 320, 80);
+  gtk_widget_set_name(img_jogador,resultado);
+
+  GtkWidget *bt_final = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_ganha), bt_final,447, 355);
+  gtk_widget_set_size_request(bt_final, 166, 46);
+  gtk_widget_set_name(bt_final,"bt_final");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_final),"button_press_event",G_CALLBACK(fecha_tela),tela_ganha); 
+}
+
+
+//Desabilita botão de comprar carta
+void bt_desabilita_compra(GtkWidget *widget, gpointer data){
+  GtkStyleContext *context;
+  context = gtk_widget_get_style_context(bt_compra_carta);
+  gtk_style_context_add_class(context,"bt_compra_carta_db");
+}
+
+//Altera botão nova jogada para iniciar outro jogador
+void troca_bt_jogador(){
+  GtkStyleContext *context;
+  context = gtk_widget_get_style_context(bt_finaliza_jog);
+  gtk_style_context_add_class(context,"bt_novo_jogador");
+}
+
+
+void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
+  LISTA_CARTAS_PTR atual = Jogador->cartas;
+  while(atual != NULL){
+    gtk_widget_set_child_visible(atual->img, 0);
     atual = atual->prox;
   }
 }

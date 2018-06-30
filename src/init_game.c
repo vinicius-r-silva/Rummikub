@@ -33,7 +33,7 @@ void init_mouse(){
   mouse = gdk_seat_get_pointer (seat);
 }
 
-void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR Lista_Jogadores){
+void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores){
   GtkWidget *home = gtk_fixed_new();
   gtk_fixed_put(GTK_FIXED(fixed), home, 0, 0);
 
@@ -98,7 +98,7 @@ void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR Lista_Jogadores){
 
 void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
   g_print("\n\n%d\n\n",data->bt_ativo);
-  JOGADORES_PTR Lista_Jogadores = data->Lista_Jogadores;
+  JOGADORES_PTR Lista_Jogadores = *(data->Lista_Jogadores);
 
   if(data->bt_ativo > 1){
     gtk_widget_destroy((data->obj_home));
@@ -109,6 +109,7 @@ void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
     Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
     tela_bem_vindo();
     atualiza_janela();
+    *(data->Lista_Jogadores) = Lista_Jogadores;
   }
   else{
     g_print("Nao selecionou n jogadores");

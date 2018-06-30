@@ -65,10 +65,10 @@ struct bt_jog{
   GtkWidget *n_4;
   GtkWidget *n_5;
   GtkWidget *obj_home;
-  
+
   int bt_ativo;
   struct lista_cartas *Baralho;
-  struct jogadores *Lista_Jogadores;
+  struct jogadores **Lista_Jogadores;
 };
 
 typedef struct bt_jog LISTA_BT_JOG;

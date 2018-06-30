@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
   Init_Baralho(&Baralho, fixed);
   Lista_Jogadores = NULL;
 
-  tela_home(Baralho, Lista_Jogadores);
+  tela_home(Baralho, &Lista_Jogadores);
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
   g_object_unref(icon);
   gtk_main(); //cria janela 

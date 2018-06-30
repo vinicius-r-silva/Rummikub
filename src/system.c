@@ -221,8 +221,18 @@ void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd){
 }
 
 void Pixel_2_LinCol(int *lin, int *col, int x, int y){
-    if (x < INICIO_X_MESA || x > (FIM_X_MESA - TAM_X_CARTA) || y < INICIO_Y_MESA || y > (FIM_Y_MESA - TAM_Y_CARTA))
+    //if (x < INICIO_X_MESA || x > (FIM_X_MESA - TAM_X_CARTA) || y < INICIO_Y_MESA || y > (FIM_Y_MESA - TAM_Y_CARTA))
+    //if (x < INICIO_X_MESA){
+    //    return;
+   // }
+    y += TAM_Y_CARTA/2;
+    x += TAM_X_CARTA/2;
+
+    if(y > FIM_Y_MESA - TAM_Y_CARTA){
+        *lin = 0;
+        *col = 0;
         return;
+    }
     
     int Espaco_X_Carta = TAM_X_CARTA + TAM_X_ESPACO;
     int Espaco_Y_Carta = TAM_Y_CARTA + TAM_Y_ESPACO;
@@ -239,7 +249,7 @@ void Pixel_2_LinCol(int *lin, int *col, int x, int y){
     int linha  = Pos_Y_Carta / Espaco_Y_Carta;
 
     int dir = (Pos_X_Carta % Espaco_X_Carta > Espaco_X_Carta/2) ? 1 : 0;
-    int inf = (Pos_Y_Carta % Espaco_Y_Carta > Espaco_Y_Carta/2) ? 1 : 0;
+    int inf = (Pos_Y_Carta % Espaco_Y_Carta > Espaco_Y_Carta/1.5) ? 1 : 0;
 
     if (dir)
         coluna++;
@@ -253,7 +263,9 @@ void Pixel_2_LinCol(int *lin, int *col, int x, int y){
 void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int linha, int coluna){
     LISTA_MESA_PTR prev = NULL;
     LISTA_MESA_PTR Atual = *Mesa;
+    g_print("Atual->y: %d, l: %d, c: %d\n", Atual->y, linha, coluna);
     if(Atual == NULL || Atual->y > linha || (Atual->y == linha && Atual->x > coluna)){
+        g_print("Entrou\n");
         *Monte = *Mesa;
         *pos = -1;
         return;
@@ -268,23 +280,55 @@ void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int l
         Atual = Atual->prox;
     }
 
-    if (Atual == NULL || Atual->y > linha || prev->x + prev->N_Cartas+1 < coluna)
-        *pos = -1;
-    else 
+    if(Atual != NULL && (Atual->y == linha && Atual->x <= coluna && Atual->x+Atual->N_Cartas + 1 >= coluna)){
+        *Monte = Atual;
+        *pos = coluna - Atual->x;
+        return;
+    }
+    else if(prev != NULL && (prev->y == linha && prev->x <= coluna && prev->x+prev->N_Cartas + 1 >= coluna)){
+        *Monte = prev;
         *pos = coluna - prev->x;
+        return;
+    }
 
-    *Monte = prev;
+    *pos = -1;
+    if (prev == NULL || (Atual != NULL && (Atual->y < linha || (Atual->y == linha && Atual->x < coluna))))
+        *Monte = Atual;
+    else    
+        *Monte = prev;
+
+    /*if (Atual != NULL && (Atual->y > linha || (Atual->y == linha && Atual->x != coluna)))
+        *pos = -1;
+    else if (prev != NULL && (prev->y > linha || prev->y != linha || ((prev->x + prev->N_Cartas+1) < coluna)))
+        *pos = -1;
+    else if (prev != NULL)
+        *pos = coluna - prev->x;
+    else
+        *pos = 0;
+
+    if(Atual != NULL && Atual->x == coluna)
+        *Monte = Atual;
+    else
+        *Monte = prev;*/
+}
+
+LISTA_CARTAS_PTR Mao_Jogador_Atual(JOGADORES_PTR *Lista_Jogadores){
+    JOGADORES_PTR atual = *Lista_Jogadores;
+    while(!atual->Sua_Vez)
+        atual = atual->prox;
+    
+    return atual->cartas;
 }
 
 void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista){
     LISTA_CARTAS_PTR prev_mao = NULL;
     LISTA_CARTAS_PTR atual_mao = *mao;
-    while(atual_mao != NULL && atual_mao->naipe != Naipe && atual_mao->numero != Numero){
+    while(atual_mao != NULL && (atual_mao->naipe != Naipe || atual_mao->numero != Numero)){
         prev_mao = atual_mao;
         atual_mao = atual_mao->prox;
     }
     if(atual_mao == NULL){
-        printf("Erro 10 - Carta Nao encontrada\n");
+        g_print("Erro 10 - Carta Nao encontrada\n");
         return;
     }
 
@@ -317,13 +361,14 @@ void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Num
     else
         Mesa_Atual = *mesa;
 
-    int cont = 1;
+    int cont = 0;
     LISTA_CARTAS_PTR prev_destino = NULL;
     LISTA_CARTAS_PTR atual_destino = Mesa_Atual->cartas;
 
     while(atual_destino != NULL && cont < Pos){
         prev_destino = atual_destino;
         atual_destino = atual_destino->prox;
+        cont++;
     }
     if(prev_destino == NULL)
         Mesa_Atual->cartas = atual_mao;
@@ -332,4 +377,75 @@ void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Num
 
     Mesa_Atual->N_Cartas++;
     atual_mao->prox = atual_destino;
+}
+
+void Organiza_Mesa(LISTA_MESA_PTR *Mesa){
+    if(*Mesa == NULL)
+        return;
+
+    int linha = 0;
+    int coluna = 0;
+
+    LISTA_MESA_PTR mesa_atual = *Mesa;
+
+    while(mesa_atual != NULL){
+        if (coluna + mesa_atual->N_Cartas > N_MAX_COLUNAS && coluna != 0){
+            coluna = 0;
+            linha++;
+        }
+
+        mesa_atual->x = coluna;
+        mesa_atual->y = linha;
+
+        coluna += mesa_atual->N_Cartas + 1;
+        mesa_atual = mesa_atual->prox;
+    }
+}
+
+
+int Naipe_2_int(char Naipe){
+    switch(Naipe){
+        case (NAIPE_1):
+            return 1;
+
+        case (NAIPE_2):
+            return 2;
+
+        case (NAIPE_3):
+            return 3;
+
+        case (NAIPE_4):
+            return 4;
+
+        case (CORINGA):
+            return -1;
+
+        default:
+            return -2;
+    }
+}
+
+int Hexa_2_int(char Numero){
+    if (Numero >= '0' && Numero <= '9')
+        Numero -= '0';
+    else if (Numero >= 'A' && Numero <= 'Z')
+        Numero -= 'A' - 10;
+    else if (Numero >= 'a' && Numero <= 'z')
+        Numero -= 'a' - 10;
+    else if (Numero == '*')
+        Numero = -1;
+    else
+        Numero = -2;
+
+    return (int)Numero;
+}
+
+void EventBox_2_Carta(GtkWidget *EventBox, int *Naipe, int *Numero){
+    char *nome;// = (char*)malloc(10*sizeof(char)); memset(nome, 0, sizeof(char)*10);
+    nome = (char*)gtk_widget_get_name(EventBox);
+
+    *Numero = Hexa_2_int (nome[3]);
+    *Naipe = Naipe_2_int (nome[4]);
+
+    g_print("\n\nNome: %s, Na: %d (%c), Nu: %d (%c)\n\n", nome, *Naipe, nome[4], *Numero, nome[3]);
 }

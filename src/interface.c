@@ -10,7 +10,7 @@ void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
   img_Y += descola_Y;
 
   if (img_X < INICIO_X_MESA){
-    img_X = 1;
+    img_X = INICIO_X_MESA;
   }
   else if(img_X > SCREEN_SIZE_X-TAM_X_CARTA){
     img_X = SCREEN_SIZE_X-TAM_X_CARTA;
@@ -87,4 +87,43 @@ void Tira_Borda_Jogador(JOGADORES_PTR Jogador){
   sprintf(Caminho,"src/image/user%d.png",Jogador->Id+1);
 
   gtk_image_set_from_file(GTK_IMAGE(Jogador->img), Caminho);
+}
+
+void atualiza_carta(GtkWidget *img, int x, int y){
+  gtk_fixed_move (GTK_FIXED(fixed), img, x, y);
+}
+
+
+void Imprime_mao_jogador(LISTA_CARTAS_PTR *Mao, int linha, int coluna, int Pixel_X_Inicial, int Pixel_Y_Inicial){
+	LISTA_CARTAS_PTR atual = *Mao;
+  
+  GtkWidget *Img;
+  int Pos_x = 0, Pos_y = 0;
+
+
+  while(atual != NULL){
+    Img = atual->img;
+    Grid_2_Pixel(linha, coluna, &Pos_x, &Pos_y, Pixel_X_Inicial, Pixel_Y_Inicial);
+
+    atualiza_carta(Img, Pos_x, Pos_y);
+    gtk_widget_set_child_visible(Img, 1);
+    g_print("%d - N: %s, x: %d, y: %d, N: %c, V: %c\n", coluna, gtk_widget_get_name(Img), Pos_x, Pos_y, Int_2_Naipe(atual->naipe), int_2_hexa(atual->numero));
+
+    atual = atual->prox;
+
+    coluna++;
+    if(coluna > N_MAX_COLUNAS){
+      coluna = 0;
+      linha++;
+    }
+  }
+}
+
+void atualiza_cartas_mesa(LISTA_MESA_PTR *Lista_Mesas){
+  LISTA_MESA_PTR atual = *Lista_Mesas;
+
+  while(atual != NULL){
+    Imprime_mao_jogador(&(atual->cartas), atual->y, atual->x, INICIO_X_MESA, INICIO_Y_MESA);
+    atual = atual->prox;
+  }
 }

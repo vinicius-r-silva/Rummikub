@@ -25,6 +25,26 @@ gboolean mouse_moved(GtkWidget *widget,GdkEventMotion *event, gpointer user_data
     return 1;
 }
 
+void Imprime_cartas(LISTA_CARTAS_PTR Lista_Carta){
+    while(Lista_Carta != NULL){
+        g_print("%c | %c\n", int_2_hexa(Lista_Carta->numero), Int_2_Naipe(Lista_Carta->naipe));
+        Lista_Carta = Lista_Carta->prox;
+    }
+    g_print("\n");
+}
+
+void imprime_mesa(LISTA_MESA_PTR *Lista_Mesas){
+  LISTA_MESA_PTR atual = *Lista_Mesas;
+  printf("comeco mesa: \n");
+  while(atual != NULL){
+    printf("Mesa: x: %d, y: %d, Qtd: %d\n", atual->x, atual->y, atual->N_Cartas);
+    Imprime_cartas(atual->cartas);
+    atual = atual->prox;
+  }
+  printf("fim mesa \n\n\n");
+}
+
+
 gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   int linha = 0, coluna = 0;
   int img_x = 0, img_y = 0;
@@ -42,15 +62,26 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   if(Monte == NULL)
     g_print("Monte Vazio, pos: %d", pos);
   else
-    g_print("Mx:  %d, My:  %d, pos; %d\n", Monte->x, Monte->y, pos);
+    g_print("Mx:  %d, My:  %d, Qtd_Carta: %d, pos; %d\n", Monte->x, Monte->y, Monte->N_Cartas, pos);
 
+  imprime_mesa(&Mesa);
 
   int Naipe, Numero;
   int Nova_Lista = (pos == -1) ? 1 : 0;
   EventBox_2_Carta(image, &Naipe, &Numero);
+
+  g_print("Naipe: %d (%c), Valor: %d (%c)\n", Naipe, Int_2_Naipe(Naipe), Numero, int_2_hexa(Numero));
   LISTA_CARTAS_PTR Mao_Jogador =  Mao_Jogador_Atual(&Lista_Jogadores);
-  mao_2_monte(&Mao_Jogador, &Mesa, Naipe, Numero, pos, Nova_Lista);
+  g_print("Mao Jogador: \n");
+  Imprime_cartas(Mao_Jogador);
+  g_print("fim mao jogador\n\n");
+
+  mao_2_monte(&Mao_Jogador, &Monte, Naipe, Numero, pos, Nova_Lista);
+
+  imprime_mesa(&Mesa);
+
   Organiza_Mesa(&Mesa);
+  imprime_mesa(&Mesa);
   atualiza_cartas_mesa(&Mesa);
 
 

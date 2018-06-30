@@ -47,7 +47,9 @@ GdkPixbuf *create_pixbuf(const gchar * filename) {
   return pixbuf;
 }
 
+LISTA_MESA_PTR Mesa;
 JOGADORES_PTR Lista_Jogadores;
+static LISTA_CARTAS_PTR Baralho;
 
 void init_mouse(){
   GdkSeat * seat;
@@ -91,7 +93,6 @@ void troca_bt_jogador(){
   gtk_style_context_add_class(context,"bt_novo_jogador");
 }
 
-static LISTA_CARTAS_PTR Baralho;
 
 void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
   LISTA_CARTAS_PTR atual = Jogador->cartas;
@@ -101,34 +102,8 @@ void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
   }
 }
 
-void atualiza_carta(GtkWidget *img, int x, int y){
-  gtk_fixed_move (GTK_FIXED(fixed), img, x, y);
-}
-
-void Imprime_mao_jogador(LISTA_CARTAS_PTR *Mao, int linha, int coluna, int Pixel_X_Inicial, int Pixel_Y_Inicial){
-	LISTA_CARTAS_PTR atual = *Mao;
-  
-  GtkWidget *Img;
-  int Pos_x = 0, Pos_y = 0;
 
 
-  while(atual != NULL){
-    Img = atual->img;
-    Grid_2_Pixel(linha, coluna, &Pos_x, &Pos_y, Pixel_X_Inicial, Pixel_Y_Inicial);
-
-    atualiza_carta(Img, Pos_x, Pos_y);
-    gtk_widget_set_child_visible(Img, 1);
-    g_print("%d - N: %s, x: %d, y: %d, N: %c, V: %c\n", coluna, gtk_widget_get_name(Img), Pos_x, Pos_y, Int_2_Naipe(atual->naipe), int_2_hexa(atual->numero));
-
-    atual = atual->prox;
-
-    coluna++;
-    if(coluna > N_MAX_COLUNAS){
-      coluna = 0;
-      linha++;
-    }
-  }
-}
 
 
 
@@ -273,8 +248,8 @@ int main(int argc, char *argv[]) {
   Imprime(Lista_Jogadores->cartas);
   Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
 
-  LISTA_MESA_PTR Mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
-  Mesa->x = 5;
+  Mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
+  Mesa->x = 0;
   Mesa->y = 0;
   Mesa->N_Cartas = 3;
   Mesa->prox = NULL;
@@ -287,7 +262,7 @@ int main(int argc, char *argv[]) {
   printf("Mesa: \n");
   Imprime(Mesa->cartas);
   printf("\n\n");
-  Imprime_mao_jogador(&(Mesa->cartas), Mesa->y, Mesa->x, INICIO_X_MESA, INICIO_Y_MESA);
+  atualiza_cartas_mesa(&Mesa);
 
 
 

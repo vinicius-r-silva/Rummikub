@@ -105,17 +105,16 @@ void atualiza_carta(GtkWidget *img, int x, int y){
   gtk_fixed_move (GTK_FIXED(fixed), img, x, y);
 }
 
-void Imprime_mao_jogador(LISTA_CARTAS_PTR *Mao){
+void Imprime_mao_jogador(LISTA_CARTAS_PTR *Mao, int linha, int coluna, int Pixel_X_Inicial, int Pixel_Y_Inicial){
 	LISTA_CARTAS_PTR atual = *Mao;
   
   GtkWidget *Img;
-  int linha = 0, coluna = 0;
   int Pos_x = 0, Pos_y = 0;
 
 
   while(atual != NULL){
     Img = atual->img;
-    Grid_2_Pixel(linha, coluna, &Pos_x, &Pos_y, INICIO_X_MAO, INICIO_Y_MAO);
+    Grid_2_Pixel(linha, coluna, &Pos_x, &Pos_y, Pixel_X_Inicial, Pixel_Y_Inicial);
 
     atualiza_carta(Img, Pos_x, Pos_y);
     gtk_widget_set_child_visible(Img, 1);
@@ -171,7 +170,7 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
   Tira_Borda_Jogador(atual);
   Oculta_mao_Jogador(atual);
   Coloca_Borda_Jogador(atual->prox);
-  Imprime_mao_jogador(&(atual->prox->cartas));
+  Imprime_mao_jogador(&(atual->prox->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   return;
 }
 
@@ -233,6 +232,9 @@ void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores){
   }
 }
 
+void Interface_Coloca_Mesa(LISTA_MESA_PTR *Mesa){
+
+}
 
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);//pega endereços dos parametros
@@ -269,7 +271,23 @@ int main(int argc, char *argv[]) {
   cria_mao_jogadores(&Lista_Jogadores);
 
   Imprime(Lista_Jogadores->cartas);
-  Imprime_mao_jogador(&(Lista_Jogadores->cartas));
+  Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+
+  LISTA_MESA_PTR Mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
+  Mesa->x = 5;
+  Mesa->y = 0;
+  Mesa->N_Cartas = 3;
+  Mesa->prox = NULL;
+  Mesa->cartas = NULL;
+  
+  int cont;
+  for(cont = 0; cont < 3; cont++){
+    Baralho_2_mao(&Baralho, &(Mesa->cartas));
+  }
+  printf("Mesa: \n");
+  Imprime(Mesa->cartas);
+  printf("\n\n");
+  Imprime_mao_jogador(&(Mesa->cartas), Mesa->y, Mesa->x, INICIO_X_MESA, INICIO_Y_MESA);
 
 
 

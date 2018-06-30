@@ -23,8 +23,15 @@ gboolean mouse_moved(GtkWidget *widget,GdkEventMotion *event, gpointer user_data
     return 1;
 }
 
+gboolean focus_out(GtkWidget *image, GdkEvent  *event,gpointer   user_data){
+  int linha = 0, coluna = 0;
+  int img_x = 0, img_y = 0;
+  gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_x, &img_y);
+  
+  Pixel_2_LinCol(&linha, &coluna, img_x, img_y);
+  g_print("SAIU:\n");
+  g_print("Img: %d, %d\n", img_x, img_y);
+  g_print("lin: %d, col: %d\n", linha, coluna);
 
-gboolean focus_out(GtkWidget *widget, GdkEvent  *event,gpointer   user_data){
-  g_print("SAIU");
   return 1;
 }

@@ -219,3 +219,117 @@ void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd){
     atual->prox = *Lista_Jogadores;
     return;
 }
+
+void Pixel_2_LinCol(int *lin, int *col, int x, int y){
+    if (x < INICIO_X_MESA || x > (FIM_X_MESA - TAM_X_CARTA) || y < INICIO_Y_MESA || y > (FIM_Y_MESA - TAM_Y_CARTA))
+        return;
+    
+    int Espaco_X_Carta = TAM_X_CARTA + TAM_X_ESPACO;
+    int Espaco_Y_Carta = TAM_Y_CARTA + TAM_Y_ESPACO;
+
+    int Pos_X_Carta = x - INICIO_X_MESA;
+    int Pos_Y_Carta = y - INICIO_Y_MESA;
+
+    if(Pos_X_Carta < 0)
+        Pos_X_Carta = 0;
+    if(Pos_Y_Carta < 0)
+        Pos_Y_Carta = 0;
+
+    int coluna = Pos_X_Carta / Espaco_X_Carta;
+    int linha  = Pos_Y_Carta / Espaco_Y_Carta;
+
+    int dir = (Pos_X_Carta % Espaco_X_Carta > Espaco_X_Carta/2) ? 1 : 0;
+    int inf = (Pos_Y_Carta % Espaco_Y_Carta > Espaco_Y_Carta/2) ? 1 : 0;
+
+    if (dir)
+        coluna++;
+    if (inf)
+        linha++;
+
+    *lin = linha;
+    *col = coluna;
+}
+
+void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int linha, int coluna){
+    LISTA_MESA_PTR prev = NULL;
+    LISTA_MESA_PTR Atual = *Mesa;
+    if(Atual == NULL || Atual->y > linha || (Atual->y == linha && Atual->x > coluna)){
+        *Monte = *Mesa;
+        *pos = -1;
+        return;
+    }
+
+    while(Atual != NULL && Atual->y < linha){
+        prev = Atual;
+        Atual = Atual->prox;
+    }
+    while(Atual != NULL && Atual->y == linha && Atual->x < coluna){
+        prev = Atual;
+        Atual = Atual->prox;
+    }
+
+    if (Atual == NULL || Atual->y > linha || prev->x + prev->N_Cartas+1 < coluna)
+        *pos = -1;
+    else 
+        *pos = coluna - prev->x;
+
+    *Monte = prev;
+}
+
+void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista){
+    LISTA_CARTAS_PTR prev_mao = NULL;
+    LISTA_CARTAS_PTR atual_mao = *mao;
+    while(atual_mao != NULL && atual_mao->naipe != Naipe && atual_mao->numero != Numero){
+        prev_mao = atual_mao;
+        atual_mao = atual_mao->prox;
+    }
+    if(atual_mao == NULL){
+        printf("Erro 10 - Carta Nao encontrada\n");
+        return;
+    }
+
+    if(prev_mao == NULL)
+        *mao = atual_mao->prox;
+    else
+        prev_mao->prox = atual_mao->prox;
+
+    atual_mao->prox = NULL;
+    LISTA_MESA_PTR Mesa_Atual;
+
+    if(Nova_Lista){
+        LISTA_MESA_PTR Nova_mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
+        Nova_mesa->x = 0;
+        Nova_mesa->y = 0;
+        Nova_mesa->N_Cartas = 0;
+        Nova_mesa->prox = NULL;
+        Nova_mesa->cartas = NULL;
+        
+        if(*mesa == NULL)
+            *mesa = Nova_mesa;
+        else{
+            Nova_mesa->prox = (*mesa)->prox;
+            (*mesa)->prox = Nova_mesa;
+        }
+
+        Pos = 0;
+        Mesa_Atual = Nova_mesa;
+    }
+    else
+        Mesa_Atual = *mesa;
+
+    int cont = 1;
+    LISTA_CARTAS_PTR prev_destino = NULL;
+    LISTA_CARTAS_PTR atual_destino = Mesa_Atual->cartas;
+
+    while(atual_destino != NULL && cont < Pos){
+        prev_destino = atual_destino;
+        atual_destino = atual_destino->prox;
+    }
+    if(prev_destino == NULL)
+        Mesa_Atual->cartas = atual_mao;
+    else
+        prev_destino->prox = atual_mao;
+
+    Mesa_Atual->N_Cartas++;
+    atual_mao->prox = atual_destino;
+}

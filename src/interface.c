@@ -9,7 +9,7 @@ void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
   img_X += descola_X;
   img_Y += descola_Y;
 
-  if (img_X < 1){
+  if (img_X < INICIO_X_MESA){
     img_X = 1;
   }
   else if(img_X > SCREEN_SIZE_X-TAM_X_CARTA){

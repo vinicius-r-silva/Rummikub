@@ -59,6 +59,18 @@ struct jogadores {
     struct jogadores *prox;
 };
 
+struct bt_jog{
+  GtkWidget *n_2;
+  GtkWidget *n_3;
+  GtkWidget *n_4;
+  GtkWidget *n_5;
+  GtkWidget *obj_home;
+  int bt_ativo;
+};
+
+typedef struct bt_jog LISTA_BT_JOG;
+typedef LISTA_BT_JOG *LISTA_BT_JOG_PTR;
+
 typedef struct lista_cartas LISTA_CARTAS;
 typedef LISTA_CARTAS *LISTA_CARTAS_PTR;
 

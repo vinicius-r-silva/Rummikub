@@ -6,6 +6,7 @@
 #include "system.h"
 #include "eventos.h"
 
+void atualiza_janela();
 void move_imagem(GtkWidget *image,int descola_X, int descola_Y);
 GtkWidget* Insere_Carta_Interface(int Naipe, int Valor, GtkWidget *Painel, char Interacao);
 void Insere_Img_Jogador(JOGADORES_PTR Jogador);

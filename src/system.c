@@ -261,9 +261,10 @@ void Pixel_2_LinCol(int *lin, int *col, int x, int y){
 }
 
 void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int linha, int coluna){
+    g_print("1\n");
     LISTA_MESA_PTR prev = NULL;
     LISTA_MESA_PTR Atual = *Mesa;
-    g_print("Atual->y: %d, l: %d, c: %d\n", Atual->y, linha, coluna);
+    //g_print("Atual->y: %d, l: %d, c: %d\n", Atual->y, linha, coluna);
     if(Atual == NULL || Atual->y > linha || (Atual->y == linha && Atual->x > coluna)){
         g_print("Entrou\n");
         *Monte = *Mesa;
@@ -341,6 +342,7 @@ void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Num
     LISTA_MESA_PTR Mesa_Atual;
 
     if(Nova_Lista){
+        g_print("10\n");
         LISTA_MESA_PTR Nova_mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
         Nova_mesa->x = 0;
         Nova_mesa->y = 0;
@@ -351,6 +353,7 @@ void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Num
         if(*mesa == NULL)
             *mesa = Nova_mesa;
         else{
+            g_print("11\n");
             Nova_mesa->prox = (*mesa)->prox;
             (*mesa)->prox = Nova_mesa;
         }

@@ -32,11 +32,228 @@ GtkWidget *img_user5_foco;
 
 GtkWidget *img_mao;
 
+LISTA_MESA_PTR Mesa;
+JOGADORES_PTR Lista_Jogadores;
+static LISTA_CARTAS_PTR Baralho;
+
 /*---- CSS ------------------*/
 GtkCssProvider *provider;
 GdkDisplay *display;
 GdkScreen *screen;
 /*---------------------------*/
+void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
+  gtk_widget_destroy((callback_params));
+  return;
+}
+
+//Cria tela de bem vindo para os usuarios
+void tela_bem_vindo(){
+  GtkWidget *tela_inicial = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_inicial, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_inicial), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_bem_vindo");
+
+
+  GtkWidget *bt_pronto = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_inicial), bt_pronto,401, 315);
+  gtk_widget_set_size_request(bt_pronto, 258, 65);
+  gtk_widget_set_name(bt_pronto,"bt_pronto");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_tela), tela_inicial); 
+}
+
+//Cria tela de erro na mesa
+void tela_erro_jogada(){
+  GtkWidget *tela_erro_jogada = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_erro_jogada, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_erro_jogada), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_erro_jogada");
+
+  GtkWidget *bt_pronto = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_erro_jogada), bt_pronto,447, 355);
+  gtk_widget_set_size_request(bt_pronto, 166, 46);
+  gtk_widget_set_name(bt_pronto,"bt_ok");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_tela), tela_erro_jogada); 
+}
+
+
+//Cria tela ganhador do jogo
+void tela_ganhador(int jogador){
+  GtkWidget *tela_ganha = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_ganha, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_ganha), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_ganha");
+
+  char resultado[30]; memset(resultado, 0, sizeof(char)*27);
+  sprintf(resultado,"img_jogador_%d",jogador);
+
+  GtkWidget *img_jogador = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_ganha), img_jogador,370,210);
+  gtk_widget_set_size_request(img_jogador, 320, 80);
+  gtk_widget_set_name(img_jogador,resultado);
+
+  GtkWidget *bt_final = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_ganha), bt_final,447, 355);
+  gtk_widget_set_size_request(bt_final, 166, 46);
+  gtk_widget_set_name(bt_final,"bt_final");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_final),"button_press_event",G_CALLBACK(fecha_tela),tela_ganha); 
+}
+
+void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores){
+  JOGADORES_PTR atual = *Lista_Jogadores;
+  int cont;
+  int prev_id = 0;
+
+  for(cont = 0; cont < 14; cont++){
+    Baralho_2_mao(&Baralho, &(atual->cartas));
+  }
+  atual = atual->prox;
+
+  while(prev_id < atual->Id){
+    for(cont = 0; cont < 14; cont++){
+      Baralho_2_mao(&Baralho, &(atual->cartas));
+    }
+    prev_id = atual->Id;
+    atual = atual->prox;
+  }
+}
+
+
+void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
+  g_print("\n\n%d\n\n",data->bt_ativo);
+  if(data->bt_ativo > 1){
+    gtk_widget_destroy((data->obj_home));
+
+    criar_jogadores(&Lista_Jogadores,data->bt_ativo);
+    printf("\n\nJogadores:\n");
+
+    //Imprime_Jodagores(Lista_Jogadores);
+
+    cria_mao_jogadores(&Lista_Jogadores);
+
+    //Imprime(Lista_Jogadores->cartas);
+    Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+    tela_bem_vindo();
+    atualiza_janela();
+  }
+  else{
+    g_print("Nao selecionou n jogadores");
+  }
+  return;
+}
+
+void ativa_n_jog(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
+  const gchar *id_bt =  gtk_widget_get_name((bt));
+  //g_print("%s\n", id_bt);
+
+  GtkStyleContext *context2 = gtk_widget_get_style_context(data->n_2);
+  gtk_style_context_remove_class(context2,"bt_n_jog_2_foco");
+  GtkStyleContext *context3 = gtk_widget_get_style_context(data->n_3);
+  gtk_style_context_remove_class(context3,"bt_n_jog_3_foco");
+  GtkStyleContext *context4 = gtk_widget_get_style_context(data->n_4);
+  gtk_style_context_remove_class(context4,"bt_n_jog_4_foco");
+  GtkStyleContext *context5 = gtk_widget_get_style_context(data->n_5);
+  gtk_style_context_remove_class(context5,"bt_n_jog_5_foco");
+
+
+  GtkStyleContext *context = gtk_widget_get_style_context(bt);
+  if(strcmp(id_bt,"bt_n_jog_2") == 0){
+    gtk_style_context_add_class(context,"bt_n_jog_2_foco");
+    data->bt_ativo = 2;
+  }
+  else if(strcmp(id_bt,"bt_n_jog_3") == 0){
+    gtk_style_context_add_class(context,"bt_n_jog_3_foco");
+    data->bt_ativo = 3;
+  }
+  else if(strcmp(id_bt,"bt_n_jog_4") == 0){
+    gtk_style_context_add_class(context,"bt_n_jog_4_foco");
+    data->bt_ativo = 4;
+  }
+  else if(strcmp(id_bt,"bt_n_jog_5") == 0){
+    gtk_style_context_add_class(context,"bt_n_jog_5_foco");
+    data->bt_ativo = 5;
+  }
+  else{
+    return;
+  }
+  return;
+}
+
+void tela_home(){
+  GtkWidget *home = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), home, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(home), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_home");
+
+  GtkWidget *n_jogador2 = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(home), n_jogador2,340,300);
+  gtk_widget_set_size_request(n_jogador2, 70, 67);
+  gtk_widget_set_name(n_jogador2,"bt_n_jog_2");
+  GtkStyleContext *context_bt1 = gtk_widget_get_style_context(n_jogador2);
+  gtk_style_context_add_class(context_bt1,"bt_n_jog_2");
+
+  GtkWidget *n_jogador3 = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(home), n_jogador3,442,300);
+  gtk_widget_set_size_request(n_jogador3, 70, 67);
+  gtk_widget_set_name(n_jogador3,"bt_n_jog_3");
+   GtkStyleContext *context_bt2 = gtk_widget_get_style_context(n_jogador3);
+  gtk_style_context_add_class(context_bt2,"bt_n_jog_3");
+
+  GtkWidget *n_jogador4 = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(home), n_jogador4,544,300);
+  gtk_widget_set_size_request(n_jogador4, 70, 67);
+  gtk_widget_set_name(n_jogador4,"bt_n_jog_4");
+   GtkStyleContext *context_bt3 = gtk_widget_get_style_context(n_jogador4);
+  gtk_style_context_add_class(context_bt3,"bt_n_jog_4");
+
+  GtkWidget *n_jogador5 = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(home), n_jogador5,646,300);
+  gtk_widget_set_size_request(n_jogador5, 70, 67);
+  gtk_widget_set_name(n_jogador5,"bt_n_jog_5");
+   GtkStyleContext *context_bt4 = gtk_widget_get_style_context(n_jogador5);
+  gtk_style_context_add_class(context_bt4,"bt_n_jog_5");
+
+  GtkWidget *bt_inicial = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(home), bt_inicial,400, 415);
+  gtk_widget_set_size_request(bt_inicial, 260, 66);
+  gtk_widget_set_name(bt_inicial,"bt_iniciar");
+
+  LISTA_BT_JOG_PTR bts_n_jog = (LISTA_BT_JOG_PTR)malloc(sizeof(LISTA_BT_JOG));
+  memset(bts_n_jog,0,sizeof(LISTA_BT_JOG));
+  bts_n_jog->n_2 = n_jogador2;
+  bts_n_jog->n_3 = n_jogador3;
+  bts_n_jog->n_4 = n_jogador4;
+  bts_n_jog->n_5 = n_jogador5;
+
+  bts_n_jog->obj_home = home;
+  bts_n_jog->bt_ativo = 0;
+
+  //
+  g_signal_connect(G_OBJECT(n_jogador2),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog); 
+  g_signal_connect(G_OBJECT(n_jogador3),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog); 
+  g_signal_connect(G_OBJECT(n_jogador4),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog); 
+  g_signal_connect(G_OBJECT(n_jogador5),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog);
+
+  g_signal_connect(G_OBJECT(bt_inicial),"button_press_event",G_CALLBACK(comeca_jogo),bts_n_jog);
+
+}
 
 //Cria o icone na janela
 GdkPixbuf *create_pixbuf(const gchar * filename) {
@@ -46,10 +263,6 @@ GdkPixbuf *create_pixbuf(const gchar * filename) {
   if (!pixbuf) {  fprintf(stderr, "%s\n", error->message);g_error_free(error);}
   return pixbuf;
 }
-
-LISTA_MESA_PTR Mesa;
-JOGADORES_PTR Lista_Jogadores;
-static LISTA_CARTAS_PTR Baralho;
 
 void init_mouse(){
   GdkSeat * seat;
@@ -188,24 +401,7 @@ void cria_jogo_imagens(){
   gtk_fixed_put(GTK_FIXED(fixed), img_mao,120, 420);
 }
 
-void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores){
-  JOGADORES_PTR atual = *Lista_Jogadores;
-  int cont;
-  int prev_id = 0;
 
-  for(cont = 0; cont < 14; cont++){
-    Baralho_2_mao(&Baralho, &(atual->cartas));
-  }
-  atual = atual->prox;
-
-  while(prev_id < atual->Id){
-    for(cont = 0; cont < 14; cont++){
-      Baralho_2_mao(&Baralho, &(atual->cartas));
-    }
-    prev_id = atual->Id;
-    atual = atual->prox;
-  }
-}
 
 void Interface_Coloca_Mesa(LISTA_MESA_PTR *Mesa){
 
@@ -233,45 +429,18 @@ int main(int argc, char *argv[]) {
   cria_jogo_imagens(); //carrega imagens do jogo Ex: Mesa, img dos jogadores, fundo da mão do jogador
   carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
   ///////////////////////////////////////////////////////////////////////////////
-
-  Baralho = NULL;
-  Init_Baralho(&Baralho, fixed);
-
-  Lista_Jogadores = NULL;
-  criar_jogadores(&Lista_Jogadores, 3);
-  printf("\n\nJogadores:\n");
-
-  Imprime_Jodagores(Lista_Jogadores);
-
-  cria_mao_jogadores(&Lista_Jogadores);
-
-  Imprime(Lista_Jogadores->cartas);
-  Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
-
-  Mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
-  Mesa->x = 0;
-  Mesa->y = 0;
-  Mesa->N_Cartas = 3;
-  Mesa->prox = NULL;
-  Mesa->cartas = NULL;
   
-  int cont;
-  for(cont = 0; cont < 3; cont++){
-    Baralho_2_mao(&Baralho, &(Mesa->cartas));
-  }
-  printf("Mesa: \n");
-  Imprime(Mesa->cartas);
-  printf("\n\n");
-  atualiza_cartas_mesa(&Mesa);
+  Baralho = NULL;
+  Mesa = NULL;
+  Init_Baralho(&Baralho, fixed);
+  Lista_Jogadores = NULL;
 
-
-
+  tela_home();
   constroi_janela_jogo(); //carrega funções do GTK para criar a janela
   g_object_unref(icon);
   gtk_main(); //cria janela 
 
   excluir_jogadores(&Lista_Jogadores);
-
   //Deleta Jodares
   //Deletea Mesa
   return 0;

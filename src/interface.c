@@ -1,6 +1,11 @@
 #include "libs/interface.h"
 
 extern GtkWidget *fixed;
+extern GtkWidget *window;
+
+void atualiza_janela(){
+  gtk_widget_show_all(window);
+}
 
 void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
   int img_X, img_Y;
@@ -70,6 +75,7 @@ void Insere_Img_Jogador(JOGADORES_PTR Jogador){
 
   Jogador->img = gtk_image_new_from_file(Caminho); 
   gtk_fixed_put(GTK_FIXED(fixed), Jogador->img ,INICIO_X_JOGADORES, INICIO_Y_JOGADORES + ESPACO_Y_JOGADORES*Jogador->Id);
+  atualiza_janela();
 }
 
 

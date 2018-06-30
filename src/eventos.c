@@ -46,11 +46,15 @@ void imprime_mesa(LISTA_MESA_PTR *Lista_Mesas){
 
 
 gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
+  g_print("inicou focus out:\n");
   int linha = 0, coluna = 0;
   int img_x = 0, img_y = 0;
+  g_print("1\n");
   gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_x, &img_y);
+  g_print("2\n");
   
   Pixel_2_LinCol(&linha, &coluna, img_x, img_y);
+  g_print("3\n");
 
   int pos = 0;
   LISTA_MESA_PTR Monte = NULL;
@@ -60,7 +64,7 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   g_print("Img: %d, %d\n", img_x, img_y);
   g_print("lin: %d, col: %d\n", linha, coluna);
   if(Monte == NULL)
-    g_print("Monte Vazio, pos: %d", pos);
+    g_print("Monte Vazio, pos: %d\n", pos);
   else
     g_print("Mx:  %d, My:  %d, Qtd_Carta: %d, pos; %d\n", Monte->x, Monte->y, Monte->N_Cartas, pos);
 
@@ -77,6 +81,8 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   g_print("fim mao jogador\n\n");
 
   mao_2_monte(&Mao_Jogador, &Monte, Naipe, Numero, pos, Nova_Lista);
+  if(Mesa == NULL)
+    Mesa = Monte;
 
   imprime_mesa(&Mesa);
 

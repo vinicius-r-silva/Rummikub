@@ -1,6 +1,8 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <gtk/gtk.h>
+
 #define NAIPE_1 '!' 
 #define NAIPE_2 '@'
 #define NAIPE_3 '#'
@@ -15,18 +17,28 @@
 #define TAM_Y_CARTA 50
 
 #define TAM_X_ESPACO 3
-#define TAM_Y_ESPACO 15
+#define TAM_Y_ESPACO 14
 
-#define INICIO_X_MAO 122
+#define INICIO_X_MAO 129
 #define INICIO_Y_MAO 425
 
-#define SCREEN_SIZE_X 1000
+#define SCREEN_SIZE_X 1060
 #define SCREEN_SIZE_Y 563
 
+#define FIM_Y_MESA    385
+#define INICIO_Y_MESA 30
+
+#define FIM_X_MESA    1020
+#define INICIO_X_MESA 129
+
+#define INICIO_X_JOGADORES 20
+#define INICIO_Y_JOGADORES 15
+#define ESPACO_Y_JOGADORES 80
 
 struct lista_cartas {
     int naipe; //se for coringa = -1
     int numero;
+    GtkWidget *img;
     struct lista_cartas *prox;
 };
 
@@ -40,6 +52,9 @@ struct lista_mesa {
 
 struct jogadores {
     int Id;
+    char Sua_Vez;
+    GtkWidget *img;
+    char Jogada_Inicial;
     struct lista_cartas *cartas;
     struct jogadores *prox;
 };

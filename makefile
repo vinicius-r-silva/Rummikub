@@ -1,5 +1,5 @@
 # change application name here (executable output name)
-TARGET=template_app
+TARGET=rummikub
 
 # compiler
 CC=gcc
@@ -20,7 +20,7 @@ GTKLIB=`pkg-config --cflags --libs gtk+-3.0`
 LD=gcc
 LDFLAGS=$(PTHREAD) $(GTKLIB) -export-dynamic
 
-OBJS=  main.o system.o eventos.o interface.o
+OBJS=  main.o system.o eventos.o interface.o init_game.o
 
 all: $(OBJS)
 	$(LD) -o $(TARGET)  $(OBJS) $(LDFLAGS)
@@ -36,6 +36,9 @@ eventos.o: src/eventos.c
 	
 interface.o: src/interface.c
 	$(CC) -c $(CCFLAGS) src/interface.c $(GTKLIB) -o interface.o
+	
+init_game.o: src/init_game.c
+	$(CC) -c $(CCFLAGS) src/init_game.c $(GTKLIB) -o init_game.o
 
 clean:
 	rm -f *.o $(TARGET)

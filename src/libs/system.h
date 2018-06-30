@@ -24,5 +24,8 @@ void excluir_jogadores (JOGADORES_PTR *Lista_Jogadores);
 void Pixel_2_LinCol(int *lin, int *col, int x, int y);
 void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int linha, int coluna);
 void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista);
+void Organiza_Mesa(LISTA_MESA_PTR *Mesa);
+LISTA_CARTAS_PTR Mao_Jogador_Atual(JOGADORES_PTR *Lista_Jogadores);
+void EventBox_2_Carta(GtkWidget *EventBox, int *Naipe, int *Numero);
 
 #endif //SYSTEM_H

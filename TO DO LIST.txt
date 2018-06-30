@@ -29,7 +29,6 @@ DEBUGAR
 FALTAM
 
 FUNÇÕES
---> definidor_de_jogada (parametros: inicio e destino/ se o destino for NULL o cara quer cortar o monte, se não for ele quer mover)
 --> implementar na interface os 30 pontos
---> implementar na interface remanejar as cartas da mesa
 --> implementar a verificação de jogada na mesa
+--> implementar na interface carregar o arquivo txt de baralho

@@ -19,7 +19,8 @@ void Init_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel);
 JOGADORES_PTR Jogador_Atual(JOGADORES_PTR *Lista_Jogadores);
 void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd);
 void excluir_jogadores (JOGADORES_PTR *Lista_Jogadores);
-void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR Baralho);
+void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR *Baralho, LISTA_CARTAS_PTR *Backup_mao);
+
 
 char Int_2_Naipe(int Naipe);
 char int_2_hexa(int Numero);
@@ -43,12 +44,18 @@ int fim_do_jogo(LISTA_CARTAS_PTR *baralho_compras, JOGADORES_PTR *lista_jogadore
 //retorna o id, se for -1 se o jogo ainda nao acabou, erro
 int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho);
 
-int valida_jogada_inicial (LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nova);
+int valida_jogada(JOGADORES_PTR Jogador, LISTA_CARTAS_PTR *Backup_Mao, LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nova);
 
 LISTA_MESA_PTR duplicar_mesa (LISTA_MESA_PTR *lista_mesa);
 
 //verifica a validade da mesa (1-valido/0-invalido/-1 erro)
 int verifica_mesa(LISTA_MESA_PTR *lista_mesa);
 
+LISTA_CARTAS_PTR duplica_Cartas (LISTA_CARTAS_PTR *Origem);
+
+void Inverte_Lista(LISTA_CARTAS_PTR *Lista);
+
+void Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel);
+void Imprime_Baralho(LISTA_CARTAS_PTR Lista_Carta);
 
 #endif //SYSTEM_H

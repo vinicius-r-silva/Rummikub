@@ -12,7 +12,7 @@
 
 #define JOKER (INT_MAX)
 
-#define LOCAL_FILE_BARALHO "rummikub/baralho.txt"
+#define LOCAL_FILE_BARALHO "src/baralho.txt"
 
 #define N_MAX_COLUNAS 28
 
@@ -71,6 +71,7 @@ struct bt_jog{
 
   int bt_ativo;
   struct lista_cartas *Baralho;
+  struct lista_cartas **Backup_Mao;
   struct jogadores **Lista_Jogadores;
 };
 

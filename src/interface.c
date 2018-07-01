@@ -5,8 +5,16 @@ extern GtkWidget *window;
 extern GtkWidget *bt_compra_carta;
 extern GtkWidget *bt_finaliza_jog;
 
+extern LISTA_CARTAS_PTR Baralho_Global;
+
+extern JOGADORES_PTR Lista_Jogadores;
+
 void atualiza_janela(){
   gtk_widget_show_all(window);
+}
+
+void Passa_a_vez(){
+  //JOGADORES_PTR 
 }
 
 void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
@@ -136,12 +144,25 @@ void atualiza_cartas_mesa(LISTA_MESA_PTR *Lista_Mesas){
 }
 
 void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
+
   gtk_widget_destroy((callback_params));
   return;
 }
 
+void fecha_bem_vindo(GtkDialog *dialog, gint response_id, gpointer callback_params){
+  JOGADORES_PTR Jogador = Jogador_Atual(&Lista_Jogadores);
+  Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  Imprime_Baralho(Jogador->cartas);
+  Imprime_Baralho(Baralho_Global);
+  atualiza_janela();
+  gtk_widget_destroy((callback_params));
+  return;
+}
 //Cria tela de bem vindo para os usuarios
 void tela_bem_vindo(){
+  g_print("novo 1:\n");
+  Imprime_Baralho(Baralho_Global);
+  
   GtkWidget *tela_inicial = gtk_fixed_new();
   gtk_fixed_put(GTK_FIXED(fixed), tela_inicial, 0, 0);
 
@@ -157,7 +178,7 @@ void tela_bem_vindo(){
   gtk_widget_set_name(bt_pronto,"bt_pronto");
 
   //Evento fecha janela
-  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_tela), tela_inicial); 
+  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_bem_vindo), tela_inicial); 
 }
 
 //Cria tela de erro na mesa

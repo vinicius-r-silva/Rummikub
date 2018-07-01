@@ -4,7 +4,11 @@ int prev_X = 0;
 int prev_Y = 0;
 extern GdkDevice *mouse;
 extern LISTA_MESA_PTR Mesa;
+
+extern LISTA_MESA_PTR Mesa_Backup;
+extern LISTA_CARTAS_PTR Mao_Backup;
 extern JOGADORES_PTR Lista_Jogadores;
+extern LISTA_CARTAS_PTR Baralho_Global;
 
 void clique_mouse(GtkWidget *event_box,GdkEventButton *event,gpointer data){
   gint x,y;
@@ -169,6 +173,46 @@ void interface_mesa_2_mesa(int Naipe, int Numero, int img_x, int img_y, LISTA_ME
   imprime_mesa(Lista_mesas);
 }
 
+void interface_mesa_2_mao(int Naipe, int Numero, LISTA_CARTAS_PTR *mao, LISTA_CARTAS_PTR *backup_mao, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas){
+  if (Busca_Carta(backup_mao, Naipe, Numero) == NULL)
+    return;
+
+  LISTA_MESA_PTR Monte;
+  LISTA_CARTAS_PTR Carta = Busca_Carta_Mesa(Lista_mesas, &Monte, Naipe, Numero);
+
+  int nova_pos;
+  int linha = 0, coluna = 0;
+  Pixel_2_LinCol(&linha, &coluna, img_x, img_y, INICIO_X_MAO, INICIO_Y_MAO, (TAM_X_CARTA + TAM_X_ESPACO), TAM_Y_CARTA*2);
+  nova_pos = coluna + linha*N_MAX_COLUNAS;
+
+  LISTA_CARTAS_PTR prev = NULL;
+  LISTA_CARTAS_PTR atual = Monte->cartas;
+  while(atual->naipe != Naipe || atual->numero != Numero){
+    prev = atual;
+    atual = atual->prox;
+  }
+  if(prev == NULL)
+    Monte->cartas = atual->prox;
+  else 
+    prev->prox = atual->prox;
+
+  int i = 0;
+  prev = NULL;
+  atual = *mao;
+  while(atual != NULL && i < nova_pos){
+    prev = atual;
+    atual= atual->prox;
+    i++;
+  }
+
+  if(prev == NULL)
+    *mao = Carta;
+  else
+    prev->prox = Carta;
+
+  Carta->prox = atual;
+
+}
 
 gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   JOGADORES_PTR Jogador =  Jogador_Atual(&Lista_Jogadores);
@@ -206,6 +250,10 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
     interface_mesa_2_mesa(Naipe, Numero, img_x, img_y, &Mesa);
   }
 
+  else{
+    interface_mesa_2_mao(Naipe, Numero, &(Jogador->cartas), &Mao_Backup, img_x, img_y, &Mesa);
+  }
+
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   Organiza_Mesa(&Mesa);
   atualiza_cartas_mesa(&Mesa);
@@ -214,8 +262,27 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
 }
 
 void comprar_cartas_user(GtkWidget *widget, gpointer data){
-  g_print("-> Apertou comprar cartas\n");
-  //tela_ganhador(1);
+  g_print("\n\n900000000000:\n");
+  Imprime_Baralho(Baralho_Global);
+
+  JOGADORES_PTR Jogador = Jogador_Atual(&Lista_Jogadores);
+  LISTA_CARTAS_PTR temp = Jogador->cartas;
+  g_print("\n\n0:\n");
+  Imprime_Baralho(Mao_Backup);
+  g_print("\n\n1:\n");
+  Imprime_Baralho(Baralho_Global);
+  g_print("\n\n2:\n");
+  Imprime_Baralho(temp);
+  g_print("\n\n3:\n");
+  Baralho_2_mao(&Baralho_Global, &temp);
+  g_print("\n\n4:\n");
+  Imprime_Baralho(Baralho_Global);
+  g_print("\n\n5:\n");
+  Imprime_Baralho(temp);
+  Jogador->cartas = temp;
+  g_print("\n\n6:\n");
+  Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  atualiza_janela();
   return;
 }
 
@@ -223,22 +290,29 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
   //Backup
   //VErifica Ganhador
   
-  if (!verifica_mesa(&Mesa)){
+  JOGADORES_PTR atual = Jogador_Atual(&Lista_Jogadores);
+  if(!verifica_mesa(&Mesa)){
+    g_print("verifica mesa gg\n");
+  }
+  if(!valida_jogada(atual, &Mao_Backup, &Mesa_Backup, &Mesa)){
+    g_print("valida_jogada gg\n");
+  }
+
+  if (!verifica_mesa(&Mesa) || !valida_jogada(atual, &Mao_Backup, &Mesa_Backup, &Mesa)){
     tela_erro_jogada();
     return;
   }
-
-  JOGADORES_PTR atual = Lista_Jogadores;
-  int cont = 0;
-  for (cont = 0; cont < 10 && !atual->Sua_Vez; cont++)
-    atual = atual->prox;
   
-  if(cont == 10)
-    return;
-  
+  atual->Jogada_Inicial = 0;
   Tira_Borda_Jogador(atual);
   Oculta_mao_Jogador(atual);
   Coloca_Borda_Jogador(atual->prox);
   Imprime_mao_jogador(&(atual->prox->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  
+  Deleta_Mesa(&Mesa_Backup);
+  Mesa_Backup = duplicar_mesa(&Mesa);
+
+  Deleta_Lista(&Mao_Backup);
+  Mao_Backup = duplica_Cartas(&(atual->prox->cartas));
   return;
 }

@@ -1,8 +1,11 @@
 #include "libs/init_game.h"
 
+#include "libs/system.h"
+
 
 extern GtkWidget *fixed;
 extern GdkDevice *mouse;
+extern LISTA_CARTAS_PTR Baralho_Global;
 
 void carrega_estilo_jogo(){
     GtkCssProvider *provider = gtk_css_provider_new ();
@@ -33,7 +36,7 @@ void init_mouse(){
   mouse = gdk_seat_get_pointer (seat);
 }
 
-void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores){
+void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR *Backup_Mao){
   GtkWidget *home = gtk_fixed_new();
   gtk_fixed_put(GTK_FIXED(fixed), home, 0, 0);
 
@@ -85,6 +88,7 @@ void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores){
   bts_n_jog->bt_ativo = 0;
   bts_n_jog->obj_home = home;
   bts_n_jog->Baralho = Baralho;
+  bts_n_jog->Backup_Mao = Backup_Mao;
   bts_n_jog->Lista_Jogadores = Lista_Jogadores;
 
   //
@@ -102,14 +106,34 @@ void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
 
   if(data->bt_ativo > 1){
     gtk_widget_destroy((data->obj_home));
+    g_print("\n\n45000000:\n");
+    Imprime_Baralho(data->Baralho);
+    g_print("jogador: \n");
+    if(Lista_Jogadores != NULL)
+      Imprime_Baralho(Lista_Jogadores->cartas);
+    g_print("fim jogador\n");
 
     criar_jogadores(&Lista_Jogadores,data->bt_ativo);
-    cria_mao_jogadores(&Lista_Jogadores, data->Baralho);
+    cria_mao_jogadores(&Lista_Jogadores, &(data->Baralho), data->Backup_Mao);
 
-    Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+    g_print("\n\n5000000:\n");
+    Imprime_Baralho(data->Baralho);
+    g_print("jogador: \n");
+    Imprime_Baralho(Lista_Jogadores->cartas);
+    g_print("fim jogador\n");
+    
+
+    //Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
     tela_bem_vindo();
     atualiza_janela();
     *(data->Lista_Jogadores) = Lista_Jogadores;
+
+    g_print("\n\n54500000:\n");
+    Imprime_Baralho(data->Baralho);
+    g_print("jogador: \n");
+    Imprime_Baralho(Lista_Jogadores->cartas);
+    g_print("fim jogador\n");
+    Baralho_Global = data->Baralho;
   }
   else{
     g_print("Nao selecionou n jogadores");

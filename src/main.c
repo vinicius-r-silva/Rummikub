@@ -17,7 +17,10 @@ GtkWidget *bt_compra_carta;
 GtkWidget *bt_finaliza_jog;
 
 LISTA_MESA_PTR Mesa;
+LISTA_MESA_PTR Mesa_Backup;
+LISTA_CARTAS_PTR Mao_Backup;
 JOGADORES_PTR Lista_Jogadores;
+LISTA_CARTAS_PTR Baralho_Global;
 
 void Imprime(LISTA_CARTAS_PTR Lista_Carta){
     while(Lista_Carta != NULL){
@@ -56,18 +59,53 @@ int main(int argc, char *argv[]) {
   fixed = gtk_fixed_new();
   gtk_container_add(GTK_CONTAINER(window), fixed);
 
-  cria_botoes_jogo(bt_compra_carta, bt_finaliza_jog); //carrega botões no jogo
   cria_jogo_imagens(); //carrega imagens do jogo Ex: Mesa, img dos jogadores, fundo da mão do jogador
   carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
   ///////////////////////////////////////////////////////////////////////////////
   
-  LISTA_CARTAS_PTR Baralho = NULL;
+  Baralho_Global = NULL;
   Mesa = NULL;
-  Init_Baralho(&Baralho, fixed);
+  Mesa_Backup = NULL;
+  Mao_Backup = NULL;
+  //Init_Baralho(&Baralho, fixed);
+  Carrega_Baralho(&Baralho_Global, fixed);
   Lista_Jogadores = NULL;
 
-  tela_home(Baralho, &Lista_Jogadores);
+  g_print("\n\n100000000000:\n");
+  Imprime_Baralho(Baralho_Global);
+  g_print("\nJogador:\n");
+  if(Lista_Jogadores != NULL)
+    Imprime_Baralho(Lista_Jogadores->cartas);
+  g_print("Fim Jogador:\n");
+
+
+  cria_botoes_jogo(bt_compra_carta, bt_finaliza_jog); //carrega botões no jogo
+
+  g_print("\n\n200000000000:\n");
+  Imprime_Baralho(Baralho_Global);
+  g_print("\nJogador:\n");
+  if(Lista_Jogadores != NULL)
+    Imprime_Baralho(Lista_Jogadores->cartas);
+  g_print("Fim Jogador:\n");
+
+  tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
+
+  g_print("\n\n300000000000:\n");
+  Imprime_Baralho(Baralho_Global);
+  g_print("\nJogador:\n");
+  if(Lista_Jogadores != NULL)
+    Imprime_Baralho(Lista_Jogadores->cartas);
+  g_print("Fim Jogador:\n");
+
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
+
+  g_print("\n\n400000000000:\n");
+  Imprime_Baralho(Baralho_Global);
+  g_print("\nJogador:\n");
+  if(Lista_Jogadores != NULL)
+    Imprime_Baralho(Lista_Jogadores->cartas);
+  g_print("Fim Jogador:\n");
+
   g_object_unref(icon);
 
   gtk_main(); //cria janela 

@@ -13,7 +13,7 @@ GdkPixbuf *create_pixbuf(const gchar * filename);
 
 void init_mouse();
 
-void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores);
+void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR *Backup_Mao);
 
 void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data);
 

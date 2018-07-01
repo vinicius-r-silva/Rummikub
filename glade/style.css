@@ -7,6 +7,7 @@ window {
 }
 button{
 	border: 0;
+	background-repeat: no-repeat;
 }
 .bt_compra_carta{
 	background-image: url("../src/image/bt_comprar.png");
@@ -112,7 +113,6 @@ button{
 	border: 0;
 	background-size: cover;
 }
-
 .bt_n_jog_2{
 	background-image: url("../src/image/n2.png");
 }
@@ -138,7 +138,6 @@ button{
 .bt_n_jog_5_foco{
 	background-image: url("../src/image/n5_f.png");
 }
-
 #bt_iniciar{
 	background-image: url("../src/image/bt_iniciar.png");
 	background-repeat: no-repeat;
@@ -147,4 +146,50 @@ button{
 }
 #bt_iniciar:hover{
 	background-image: url("../src/image/bt_iniciar_hover.png");
+}
+#tela_tipo_entrada{
+	background-image: url("../src/image/tela_opcao_arquivo.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_sim{
+	background-image: url("../src/image/bt_sim.png");
+	background-position: center;
+}
+#bt_sim:hover{
+	background-image: url("../src/image/bt_sim_hover.png");
+}
+#bt_nao{
+	background-image: url("../src/image/bt_nao.png");
+	background-position: center;
+}
+#bt_nao:hover{
+	background-image: url("../src/image/bt_nao_hover.png");
+}
+#tela_erro_file_entrada{
+	background-image: url("../src/image/tela_erro_arquivo.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_erro_file{
+	background-image: url("../src/image/ok_v.png");
+	background-position: center;
+}
+#bt_erro_file:hover{
+	background-image: url("../src/image/ok_v_hover.png");
+}
+#tela_proximo{
+	background-image: url("../src/image/bg_prox_jogador.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_continuar{
+	background-image: url("../src/image/bt_continuar.png");
+	background-position: center;
+}
+#bt_continuar:hover{
+	background-image: url("../src/image/bt_continuar_hover.png");
 }

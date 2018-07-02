@@ -1,0 +1,112 @@
+#define FIM_Y_MESA    385
+#define INICIO_Y_MESA 30
+
+#define FIM_X_MESA    1020
+#define INICIO_X_MESA 140
+
+void Pos_Carta(LISTA_MESA_PTR *Mesa, LISTA_MESA_PTR *Monte, int *pos, int x, int y){
+    if(*Mesa == NULl){
+        *Monte = NULL;
+        *pos = 0;
+        return;
+    }
+
+    if (x < INICIO_X_MESA || x > FIM_X_MESA || y < INICIO_Y_MESA || y > FIM_Y_MESA)
+        return;
+    
+    int Pixels_X_Carta = TAM_X_CARTA + TAM_X_ESPACO;
+    int Pixels_Y_Carta = TAM_Y_CARTA + TAM_Y_ESPACO;
+
+    int Pos_X_Carta = x - INICIO_X_MESA;
+    int Pos_Y_Carta = y - INICIO_Y_MESA;
+
+    int coluna = Pos_X_Carta / Pixels_X_Carta;
+    int linha  = Pos_Y_Carta / Pixels_Y_Carta;
+
+    int dir = (Pos_X_Carta % Pixels_X_Carta > Pixels_X_Carta/2) ? 1 : 0;
+    int inf = (Pos_Y_Carta % Pixels_Y_Carta > Pixels_Y_Carta/2) ? 1 : 0;
+
+    if (dir)
+        coluna++;
+    if (inf)
+        linha++;
+
+    LISTA_MESA_PTR atual = *Monte;
+    LISTA_MESA_PTR prev  = NULL;
+
+    while(atual != NULL && atual->y < y){
+        prev = atual;
+        atual = atual->prox;
+    }
+
+    if (atual->y > y){
+        *Monte = prev;
+        *pos = 0;
+        return;
+    }
+
+
+}
+
+void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista){
+    LISTA_CARTAS_PTR prev_mao = NULL;
+    LISTA_CARTAS_PTR atual_mao = *mao;
+    while(atual_mao != NULL && atual_mao->naipe != Naipe && atual_mao->numero != Numero){
+        prev_mao = atual_mao;
+        atual_mao = atual_mao->prox;
+    }
+    if(atual_mao == NULL){
+        printf("Erro 10 - Carta Nao encontrada\n");
+        return;
+    }
+
+    if(prev_mao == NULL)
+        *mao = atual_mao->prox;
+    else
+        prev_mao->prox = atual_mao->prox;
+
+    atual_mao->prox = NULL;
+    LISTA_MESA_PTR Mesa_Atual;
+
+    if(Nova_Lista){
+        LISTA_MESA_PTR prev_mesa = NULL;
+        LISTA_MESA_PTR atual_mesa = *mesa;
+
+        LISTA_MESA_PTR Nova_mesa = (LISTA_MESA_PTR)malloc(sizeof(LISTA_MESA));
+        Nova_mesa->x = 0;
+        Nova_mesa->y = 0;
+        Nova_mesa->N_Cartas = 0;
+        Nova_mesa->prox = NULL;
+        Nova_mesa->cartas = NULL;
+
+        while(atual_mesa != NULL){
+            prev_mesa = atual_mesa;
+            atual_mesa = atual_mesa->prox;
+        }
+        if(prev_mesa == NULL)
+            *mesa = Nova_mesa;
+        else
+            prev_mesa->prox = Nova_mesa;
+
+        Pos = 0;
+        Mesa_Atual = Nova_mesa;
+    }
+    else
+        Mesa_Atual = *mesa;
+
+    int cont = 1;
+    LISTA_CARTAS_PTR prev_destino = NULL;
+    LISTA_CARTAS_PTR atual_destino = Mesa_Atual->cartas;
+
+    while(atual_destino != NULL && cont < Pos){
+        prev_destino = atual_destino;
+        atual_destino = atual_destino->prox;
+    }
+    if(prev_destino == NULL)
+        Mesa_Atual->cartas = atual_mao;
+    else
+        prev_destino->prox = atual_mao;
+
+    Mesa_Atual->N_Cartas++;
+    atual_mao->prox = atual_destino;
+}

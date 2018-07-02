@@ -41,6 +41,7 @@
 struct lista_cartas {
     int naipe; //se for coringa == JOKER
     int numero;
+    char interacao;
     GtkWidget *img;
     struct lista_cartas *prox;
 };
@@ -57,9 +58,24 @@ struct jogadores {
     int Id;
     char Sua_Vez;
     GtkWidget *img;
+    char Ja_Comprou;
     char Jogada_Inicial;
     struct lista_cartas *cartas;
     struct jogadores *prox;
+};
+
+
+struct listas {
+    struct lista_mesa *Mesa;
+    struct lista_mesa *Mesa_Backup;
+    struct lista_cartas *Baralho;
+    struct lista_cartas *Mao_Backup;
+    struct jogadores *Lista_Jogadores;
+};
+
+struct Lista_e_widget{
+    struct listas **Lista;
+    GtkWidget **Widget;
 };
 
 struct bt_jog{
@@ -86,5 +102,11 @@ typedef LISTA_MESA *LISTA_MESA_PTR;
 
 typedef struct jogadores JOGADORES;
 typedef JOGADORES *JOGADORES_PTR;
+
+typedef struct listas LISTAS;
+typedef LISTAS *LISTAS_PTR;
+
+typedef struct Lista_e_widget LIST_WIDGET;
+typedef LIST_WIDGET *LIST_WIDGET_PTR;
 
 #endif //DATA_H

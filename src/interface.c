@@ -7,7 +7,7 @@ extern GtkWidget *bt_finaliza_jog;
 
 extern LISTA_CARTAS_PTR Baralho_Global;
 
-extern JOGADORES_PTR Lista_Jogadores;
+extern LISTAS_PTR Listas;
 
 void atualiza_janela(){
   gtk_widget_show_all(window);
@@ -44,20 +44,24 @@ GtkWidget* Insere_Carta_Interface(int Naipe, int Valor, GtkWidget *Painel, char 
   GtkWidget *img_carta;
   GtkWidget *event_box;
 
+  g_print("\t\t Insere_Carta_Interface\n");
+
   char V = int_2_hexa(Valor);
   char N = Int_2_Naipe(Naipe);
 
   char resultado[27]; memset(resultado, 0, sizeof(char)*27);
   sprintf(resultado,"src/image/cartas/%c%c.png",V,N);
-  //g_print("N: %2d (%c), V: %2d (%c)\n", Naipe, N, Valor, V);
+  g_print("\t\t N: %2d (%c), V: %2d (%c), inte %d\n", Naipe, N, Valor, V, Interacao);
 
   char NomeCarta[6];
-  sprintf(NomeCarta,"%cC_%c%c",Interacao, V, N);
+  sprintf(NomeCarta,"%dC_%c%c",Interacao, V, N);
   NomeCarta[5] = '\0';
 
   char NomeEventBox[6];
-  sprintf(NomeEventBox,"%cE_%c%c",Interacao, V,N);
+  sprintf(NomeEventBox,"%dE_%c%c",Interacao, V,N);
   NomeEventBox[5] = '\0';
+
+  g_print("\t\t Nomes: %s - %s\n\n", NomeCarta, NomeEventBox);
 
   event_box = gtk_event_box_new();
   gtk_fixed_put(GTK_FIXED(Painel), event_box,0, 0);
@@ -149,18 +153,23 @@ void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
   return;
 }
 
-void fecha_bem_vindo(GtkDialog *dialog, gint response_id, gpointer callback_params){
-  JOGADORES_PTR Jogador = Jogador_Atual(&Lista_Jogadores);
+void fecha_bem_vindo(GtkDialog *dialog, gint response_id, gpointer data){
+  LISTAS_PTR Lista = (LISTA)data->Lista;
+  JOGADORES_PTR Lista_Jogadores = (*((LIST_WIDGET_PTR*)data))->(*Lista)->Lista_Jogadores;
+  JOGADORES_PTR Jogador = Jogador_Atual(Lista_Jogadores);
+
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   Imprime_Baralho(Jogador->cartas);
   Imprime_Baralho(Baralho_Global);
   atualiza_janela();
-  gtk_widget_destroy((callback_params));
+
+  GtkWidget *Tela = ((LIST_WIDGET_PTR*)data)->Widget;
+  gtk_widget_destroy(Tela);
+  free(data);
   return;
 }
 //Cria tela de bem vindo para os usuarios
-void tela_bem_vindo(){
-  g_print("novo 1:\n");
+void tela_bem_vindo(LISTAS_PTR *Lista){
   Imprime_Baralho(Baralho_Global);
   
   GtkWidget *tela_inicial = gtk_fixed_new();
@@ -171,14 +180,17 @@ void tela_bem_vindo(){
   gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
   gtk_widget_set_name(event_box,"tela_bem_vindo");
 
-
   GtkWidget *bt_pronto = gtk_button_new_with_label("");
   gtk_fixed_put(GTK_FIXED(tela_inicial), bt_pronto,401, 315);
   gtk_widget_set_size_request(bt_pronto, 258, 65);
   gtk_widget_set_name(bt_pronto,"bt_pronto");
 
   //Evento fecha janela
-  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_bem_vindo), tela_inicial); 
+  LIST_WIDGET_PTR data = (LIST_WIDGET_PTR)malloc(sizeof(LIST_WIDGET)); //O free tá no evento 'fecha_bem_vindo'
+  data->Lista = &Lista;
+  data->widget = &tela_inicial;
+  g_signal_connect(G_OBJECT(bt_pronto),"button_press_event",G_CALLBACK(fecha_bem_vindo), data); 
+  
 }
 
 //Cria tela de erro na mesa

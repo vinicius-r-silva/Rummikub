@@ -16,30 +16,13 @@ GtkWidget *fixed;
 GtkWidget *bt_compra_carta;
 GtkWidget *bt_finaliza_jog;
 
-LISTA_MESA_PTR Mesa;
+LISTAS_PTR Listas;
+
+/*LISTA_MESA_PTR Mesa;
 LISTA_MESA_PTR Mesa_Backup;
 LISTA_CARTAS_PTR Mao_Backup;
 JOGADORES_PTR Lista_Jogadores;
-LISTA_CARTAS_PTR Baralho_Global;
-
-void Imprime(LISTA_CARTAS_PTR Lista_Carta){
-    while(Lista_Carta != NULL){
-        g_print("%d | %d\n", Lista_Carta->numero, Lista_Carta->naipe);
-        Lista_Carta = Lista_Carta->prox;
-    }
-    g_print("\n\n\n");
-}
-
-void Imprime_Jodagores(JOGADORES_PTR Lista_Jogadores){
-  if (Lista_Jogadores == NULL)
-    return;
-
-  while(Lista_Jogadores->Id < Lista_Jogadores->prox->Id){
-    printf("%d\n", Lista_Jogadores->Id);
-    Lista_Jogadores = Lista_Jogadores->prox;
-  }
-  printf("%d\n\n\n", Lista_Jogadores->Id);
-}
+LISTA_CARTAS_PTR Baralho_Global;*/
 
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);//pega endereços dos parametros
@@ -63,54 +46,25 @@ int main(int argc, char *argv[]) {
   carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
   ///////////////////////////////////////////////////////////////////////////////
   
-  Baralho_Global = NULL;
-  Mesa = NULL;
-  Mesa_Backup = NULL;
-  Mao_Backup = NULL;
+  Listas = (LISTAS_PTR)malloc(sizeof(Listas));
+
+  Listas->Mesa = NULL;
+  Listas->Baralho = NULL;
+  Listas->Mesa_Backup = NULL;
+  Listas->Mao_Backup = NULL;
+  Listas->Lista_Jogadores = NULL;
+
   //Init_Baralho(&Baralho, fixed);
-  Carrega_Baralho(&Baralho_Global, fixed);
-  Lista_Jogadores = NULL;
+  Carrega_Baralho(&(Listas->Baralho), fixed);
 
-  g_print("\n\n100000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
-
-
-  cria_botoes_jogo(bt_compra_carta, bt_finaliza_jog); //carrega botões no jogo
-
-  g_print("\n\n200000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
-
-  tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
-
-  g_print("\n\n300000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
-
+  cria_botoes_jogo(&bt_compra_carta, &bt_finaliza_jog); //carrega botões no jogo
+  tela_home(Listas->Baralho, &(Listas->Lista_Jogadores), &(Listas->Mao_Backup));
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
 
-  g_print("\n\n400000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
-
   g_object_unref(icon);
-
   gtk_main(); //cria janela 
 
-  excluir_jogadores(&Lista_Jogadores);
+  excluir_jogadores(&(Listas->Lista_Jogadores));
   //Deleta Jodares
   //Deletea Mesa
   return 0;

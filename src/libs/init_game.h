@@ -23,7 +23,7 @@ void ativa_n_jog(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data);
 void constroi_janela_jogo(GtkWidget *window);
 
 //Adiciona botões no jogo e seus eventos
-void cria_botoes_jogo(GtkWidget *bt_compra_carta, GtkWidget *bt_finaliza_jog);
+void cria_botoes_jogo(GtkWidget **bt_compra_carta, GtkWidget **bt_finaliza_jog);
 
 //Função para criar imagens do jogo
 void cria_jogo_imagens();

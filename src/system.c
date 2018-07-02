@@ -696,7 +696,7 @@ int valida_jogada (JOGADORES_PTR Jogador, LISTA_CARTAS_PTR *Backup_Mao, LISTA_ME
          return 0;
     }
 
-    if (Jogador->Jogada_Inicial == 0 || Jogador->Ja_Comprou == 1)
+    if (Jogador->Jogada_Inicial == 0 || (check == NULL && Jogador->Ja_Comprou == 1))
         return 1;
 
     g_print("verificando priemira jogada\n");

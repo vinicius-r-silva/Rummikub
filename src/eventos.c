@@ -159,7 +159,7 @@ void interface_mao_2_mesa(int Naipe, int Numero, char interacao, JOGADORES_PTR J
      *Lista_mesas = Monte;
 }
 
-void interface_mesa_2_mesa(int Naipe, int Numero, char interacao, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas){ 
+void interface_mesa_2_mesa(int Naipe, int Numero, char interacao, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas, JOGADORES_PTR Jogador, LISTA_CARTAS_PTR *backup_mao){ 
   g_print("entrou interface_mesa_2_mesa\n");
 
   int linha = 0, coluna = 0;
@@ -168,8 +168,21 @@ void interface_mesa_2_mesa(int Naipe, int Numero, char interacao, int img_x, int
   int pos = 0;
   LISTA_MESA_PTR Monte = NULL;
   LinCol_2_Monte(&Monte, Lista_mesas, &pos, linha, coluna);
+
+  if(Jogador->Jogada_Inicial == 1 && Monte != NULL){
+    int Naipe_monte = Monte->cartas->naipe;
+    int Numero_monte = Monte->cartas->numero;
+    char Interacao_monte = Monte->cartas->interacao;
+    
+    int Destino_mao = (Busca_Carta(backup_mao, Naipe_monte, Numero_monte, Interacao_monte) == NULL) ? 0 : 1;
+    int Origem_mao  = (Busca_Carta(backup_mao, Naipe, Numero, interacao) == NULL) ? 0 : 1;
+    if(Destino_mao != Origem_mao)
+      return;
+  }
+
   if(Monte != NULL && pos != -1 && Busca_Carta(&(Monte->cartas), Naipe, Numero, interacao) != NULL && coluna == Monte->x+Monte->N_Cartas)
     pos = -1;
+
 
   LISTA_MESA_PTR Monte_Origem = NULL;
   Busca_Carta_Mesa(Lista_mesas, &Monte_Origem, Naipe, Numero, interacao); 
@@ -309,7 +322,7 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   }
 
   else if(!Carta_Origem_Mao && !Carta_Destino_Mao){
-    interface_mesa_2_mesa(Naipe, Numero, interacao, img_x, img_y, &Mesa);
+    interface_mesa_2_mesa(Naipe, Numero, interacao, img_x, img_y, &Mesa, Jogador, &Mao_Backup);
   }
 
   else if(!Carta_Origem_Mao && Carta_Destino_Mao){

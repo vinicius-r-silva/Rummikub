@@ -71,40 +71,12 @@ int main(int argc, char *argv[]) {
   Carrega_Baralho(&Baralho_Global, fixed);
   Lista_Jogadores = NULL;
 
-  g_print("\n\n100000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
 
-
-  cria_botoes_jogo(bt_compra_carta, bt_finaliza_jog); //carrega botões no jogo
-
-  g_print("\n\n200000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
+  cria_botoes_jogo(&bt_compra_carta, &bt_finaliza_jog); //carrega botões no jogo
 
   tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
 
-  g_print("\n\n300000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
-
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
-
-  g_print("\n\n400000000000:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\nJogador:\n");
-  if(Lista_Jogadores != NULL)
-    Imprime_Baralho(Lista_Jogadores->cartas);
-  g_print("Fim Jogador:\n");
 
   g_object_unref(icon);
 

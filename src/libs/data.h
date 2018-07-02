@@ -41,6 +41,7 @@
 struct lista_cartas {
     int naipe; //se for coringa == JOKER
     int numero;
+    char interacao;
     GtkWidget *img;
     struct lista_cartas *prox;
 };
@@ -57,6 +58,7 @@ struct jogadores {
     int Id;
     char Sua_Vez;
     GtkWidget *img;
+    char Ja_Comprou;
     char Jogada_Inicial;
     struct lista_cartas *cartas;
     struct jogadores *prox;

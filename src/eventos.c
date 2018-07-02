@@ -4,7 +4,6 @@ int prev_X = 0;
 int prev_Y = 0;
 extern GdkDevice *mouse;
 extern LISTA_MESA_PTR Mesa;
-
 extern LISTA_MESA_PTR Mesa_Backup;
 extern LISTA_CARTAS_PTR Mao_Backup;
 extern JOGADORES_PTR Lista_Jogadores;
@@ -49,6 +48,7 @@ void imprime_mesa(LISTA_MESA_PTR *Lista_Mesas){
 }
 
 void Muda_Pos_Carta(LISTA_CARTAS_PTR *Cartas, int Naipe, int Numero, int nova_pos){
+  g_print("\t\t Entrou Muda_Pos_Carta\n");
   LISTA_CARTAS_PTR atual = *Cartas;
   int Pos_Carta_a_trocar = 0;
 
@@ -65,7 +65,8 @@ void Muda_Pos_Carta(LISTA_CARTAS_PTR *Cartas, int Naipe, int Numero, int nova_po
   }
   Carta_a_trocar = atual;
 
-  if(Pos_Carta_a_trocar == nova_pos)
+  g_print("\t\t Pos_Carta_a_trocar: %d, nova_pos: %d\n", Pos_Carta_a_trocar, nova_pos);
+  if(Pos_Carta_a_trocar == nova_pos || (Carta_a_trocar->prox == NULL && Pos_Carta_a_trocar < nova_pos))
     return;
 
   if (nova_pos == 0){
@@ -145,7 +146,7 @@ void interface_mao_2_mesa(int Naipe, int Numero, LISTA_CARTAS_PTR *Origem, int i
      *Lista_mesas = Monte;
 }
 
-void interface_mesa_2_mesa(int Naipe, int Numero, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas){
+void interface_mesa_2_mesa(int Naipe, int Numero, char interacao, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas){ 
   g_print("entrou interface_mesa_2_mesa\n");
 
   int linha = 0, coluna = 0;
@@ -154,9 +155,11 @@ void interface_mesa_2_mesa(int Naipe, int Numero, int img_x, int img_y, LISTA_ME
   int pos = 0;
   LISTA_MESA_PTR Monte = NULL;
   LinCol_2_Monte(&Monte, Lista_mesas, &pos, linha, coluna);
+  if(Monte != NULL && pos != -1 && Busca_Carta(&(Monte->cartas), Naipe, Numero, interacao) != NULL && coluna == Monte->x+Monte->N_Cartas)
+    pos = -1;
 
   LISTA_MESA_PTR Monte_Origem = NULL;
-  Busca_Carta_Mesa(Lista_mesas, &Monte_Origem, Naipe, Numero);
+  Busca_Carta_Mesa(Lista_mesas, &Monte_Origem, Naipe, Numero, interacao); 
   if (pos != -1 && Monte_Origem->x == Monte->x && Monte_Origem->y == Monte->y){
     g_print("3\n");
     Muda_Pos_Carta(&(Monte->cartas), Naipe, Numero, pos);
@@ -171,14 +174,15 @@ void interface_mesa_2_mesa(int Naipe, int Numero, int img_x, int img_y, LISTA_ME
   }
 
   imprime_mesa(Lista_mesas);
+  g_print("fim interface_mesa_2_mesa\n");
 }
 
-void interface_mesa_2_mao(int Naipe, int Numero, LISTA_CARTAS_PTR *mao, LISTA_CARTAS_PTR *backup_mao, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas){
-  if (Busca_Carta(backup_mao, Naipe, Numero) == NULL)
+void interface_mesa_2_mao(int Naipe, int Numero, char interacao, LISTA_CARTAS_PTR *mao, LISTA_CARTAS_PTR *backup_mao, int img_x, int img_y, LISTA_MESA_PTR *Lista_mesas){
+  if (Busca_Carta(backup_mao, Naipe, Numero, interacao) == NULL)
     return;
 
   LISTA_MESA_PTR Monte;
-  LISTA_CARTAS_PTR Carta = Busca_Carta_Mesa(Lista_mesas, &Monte, Naipe, Numero);
+  LISTA_CARTAS_PTR Carta = Busca_Carta_Mesa(Lista_mesas, &Monte, Naipe, Numero, interacao);
 
   int nova_pos;
   int linha = 0, coluna = 0;
@@ -214,21 +218,64 @@ void interface_mesa_2_mao(int Naipe, int Numero, LISTA_CARTAS_PTR *mao, LISTA_CA
 
 }
 
+void Limpa_Monte_Vazios(LISTA_MESA_PTR *Lista_Mesas){
+  if (*Lista_Mesas == NULL)
+    return;
+  
+  g_print("1\n");
+  if((*Lista_Mesas)->cartas == NULL && (*Lista_Mesas)->prox == NULL){
+    free(*Lista_Mesas);
+    *Lista_Mesas = NULL;
+    return;
+  }
+
+  g_print("2\n");
+  LISTA_MESA_PTR prev = NULL;
+  LISTA_MESA_PTR atual = *Lista_Mesas;
+
+  while(atual != NULL){
+    g_print("3\n");
+    if(atual->cartas == NULL){
+      g_print("4\n");
+      if(prev != NULL){
+        prev->prox = atual->prox;
+        free(atual);
+        atual = prev->prox;
+      }
+      else{
+        g_print("5\n");
+        prev = atual;
+        *Lista_Mesas = atual->prox;
+        free(prev);
+        prev = NULL;
+        atual = atual->prox;
+      }
+    }
+    else {
+      prev = atual;
+      atual = atual->prox;
+    }
+    
+  }
+}
+
 gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
-  JOGADORES_PTR Jogador =  Jogador_Atual(&Lista_Jogadores);
+  g_print("inicio focus_out\n");
+  JOGADORES_PTR Jogador =  Jogador_Atual(Lista_Jogadores);
   if(Jogador == NULL)
     return 1;
 
+  char interacao;
   int Naipe, Numero;
   int img_x = 0, img_y = 0;
   gtk_widget_translate_coordinates(image, gtk_widget_get_toplevel(image), 0, 0, &img_x, &img_y);
 
-  EventBox_2_Carta(image, &Naipe, &Numero);
+  EventBox_2_Carta(image, &Naipe, &Numero, &interacao);
   int Carta_Origem_Mao = 0;
   int Carta_Destino_Mao = 0;
 
-  g_print("Na: %d, Nu: %d\n", Naipe, Numero);
-  if(Busca_Carta(&(Jogador->cartas), Naipe, Numero) != NULL)
+  g_print("Na: %d, Nu: %d, inte: %d\n", Naipe, Numero, interacao);
+  if(Busca_Carta(&(Jogador->cartas), Naipe, Numero, interacao) != NULL)
     Carta_Origem_Mao = 1;
   
   if(img_y > (FIM_Y_MESA))
@@ -239,50 +286,47 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
   }
 
   else if (Carta_Destino_Mao && Carta_Origem_Mao){
+    g_print("Carta_Destino_Mao e Carta_Origem_Mao\n");
     int linha = 0, coluna = 0, nova_pos = 0;;
     Pixel_2_LinCol(&linha, &coluna, img_x, img_y, INICIO_X_MAO, INICIO_Y_MAO, (TAM_X_CARTA + TAM_X_ESPACO), TAM_Y_CARTA*2);
 
     nova_pos = coluna + linha*N_MAX_COLUNAS;
+    g_print("lin:%d, col: %d, nova_pos: %d\n", linha, coluna, nova_pos);
     Muda_Pos_Carta(&(Jogador->cartas), Naipe, Numero, nova_pos);
   }
 
   else if(!Carta_Origem_Mao && !Carta_Destino_Mao){
-    interface_mesa_2_mesa(Naipe, Numero, img_x, img_y, &Mesa);
+    interface_mesa_2_mesa(Naipe, Numero, interacao, img_x, img_y, &Mesa);
   }
 
   else{
-    interface_mesa_2_mao(Naipe, Numero, &(Jogador->cartas), &Mao_Backup, img_x, img_y, &Mesa);
+    interface_mesa_2_mao(Naipe, Numero, interacao, &(Jogador->cartas), &Mao_Backup, img_x, img_y, &Mesa);
   }
+
+  g_print("Limpando a mesa: \n");
+  Limpa_Monte_Vazios(&Mesa);
+  g_print("Nova mesa: \n");
+  imprime_mesa(&Mesa);
+  g_print("fim limpa mesa: \n\n");
 
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   Organiza_Mesa(&Mesa);
   atualiza_cartas_mesa(&Mesa);
   
+  g_print("Fim focus_out\n\n");
   return 1;
 }
 
 void comprar_cartas_user(GtkWidget *widget, gpointer data){
-  g_print("\n\n900000000000:\n");
-  Imprime_Baralho(Baralho_Global);
+  JOGADORES_PTR Jogador = Jogador_Atual(Lista_Jogadores);
+  if(Jogador->Ja_Comprou == 1)
+    return;
 
-  JOGADORES_PTR Jogador = Jogador_Atual(&Lista_Jogadores);
-  LISTA_CARTAS_PTR temp = Jogador->cartas;
-  g_print("\n\n0:\n");
-  Imprime_Baralho(Mao_Backup);
-  g_print("\n\n1:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\n\n2:\n");
-  Imprime_Baralho(temp);
-  g_print("\n\n3:\n");
-  Baralho_2_mao(&Baralho_Global, &temp);
-  g_print("\n\n4:\n");
-  Imprime_Baralho(Baralho_Global);
-  g_print("\n\n5:\n");
-  Imprime_Baralho(temp);
-  Jogador->cartas = temp;
-  g_print("\n\n6:\n");
+  Jogador->Ja_Comprou = 1;
+  Baralho_2_mao(&Baralho_Global, &(Jogador->cartas));
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   atualiza_janela();
+
   return;
 }
 
@@ -290,7 +334,7 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
   //Backup
   //VErifica Ganhador
   
-  JOGADORES_PTR atual = Jogador_Atual(&Lista_Jogadores);
+  JOGADORES_PTR atual = Jogador_Atual(Lista_Jogadores);
   if(!verifica_mesa(&Mesa)){
     g_print("verifica mesa gg\n");
   }
@@ -298,11 +342,12 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
     g_print("valida_jogada gg\n");
   }
 
-  if (!verifica_mesa(&Mesa) || !valida_jogada(atual, &Mao_Backup, &Mesa_Backup, &Mesa)){
+  if (!verifica_mesa(&Mesa) || (!valida_jogada(atual, &Mao_Backup, &Mesa_Backup, &Mesa) && Baralho_Global != NULL)){
     tela_erro_jogada();
     return;
   }
   
+  atual->Ja_Comprou = 0;
   atual->Jogada_Inicial = 0;
   Tira_Borda_Jogador(atual);
   Oculta_mao_Jogador(atual);
@@ -314,5 +359,9 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
 
   Deleta_Lista(&Mao_Backup);
   Mao_Backup = duplica_Cartas(&(atual->prox->cartas));
+
+  if (vencedor(&Lista_Jogadores, &Baralho_Global) != -1)
+    g_print("Acabou jogo\n");
+    
   return;
 }

@@ -5,25 +5,26 @@ void Cria_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, GtkWidget *Pai
     nova->naipe = Naipe;
     nova->numero = Numero;
     nova->prox = *Baralho;
+    nova->interacao = Interacao;
     nova->img = Insere_Carta_Interface(Naipe, Numero, Painel, Interacao);
     *Baralho = nova;
 }
 
-LISTA_CARTAS_PTR Busca_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero){
+LISTA_CARTAS_PTR Busca_Carta(LISTA_CARTAS_PTR *Baralho, int Naipe, int Numero, char interacao){
     LISTA_CARTAS_PTR atual = *Baralho;
     while(atual != NULL){
-        if(atual->naipe == Naipe && atual->numero == Numero)
+        if(atual->naipe == Naipe && atual->numero == Numero && atual->interacao == interacao)
             return atual;
         atual = atual->prox;
     }
     return NULL;
 }
 
-LISTA_CARTAS_PTR Busca_Carta_Mesa(LISTA_MESA_PTR *Mesas, LISTA_MESA_PTR *Monte, int Naipe, int Numero){
+LISTA_CARTAS_PTR Busca_Carta_Mesa(LISTA_MESA_PTR *Mesas, LISTA_MESA_PTR *Monte, int Naipe, int Numero, char interacao){
     LISTA_MESA_PTR atual = *Mesas;
     LISTA_CARTAS_PTR carta = NULL;
     while(atual != NULL){
-        carta = Busca_Carta(&(atual->cartas), Naipe, Numero);
+        carta = Busca_Carta(&(atual->cartas), Naipe, Numero, interacao);
         if (carta != NULL)
             break;
 
@@ -33,9 +34,9 @@ LISTA_CARTAS_PTR Busca_Carta_Mesa(LISTA_MESA_PTR *Mesas, LISTA_MESA_PTR *Monte, 
     return carta;
 }
 
-void TrocaCarta(LISTA_CARTAS_PTR *Baralho, int Naipe_1, int Naipe_2, int Num_1, int Num_2){
-    LISTA_CARTAS_PTR Carta1 = Busca_Carta(Baralho, Naipe_1, Num_1);
-    LISTA_CARTAS_PTR Carta2 = Busca_Carta(Baralho, Naipe_2, Num_2);
+void TrocaCarta(LISTA_CARTAS_PTR *Baralho, int Naipe_1, int Naipe_2, int Num_1, int Num_2, int inte1, int inte2){
+    LISTA_CARTAS_PTR Carta1 = Busca_Carta(Baralho, Naipe_1, Num_1, inte1);
+    LISTA_CARTAS_PTR Carta2 = Busca_Carta(Baralho, Naipe_2, Num_2, inte2);
     GtkWidget *Img1 = NULL;
     GtkWidget *Img2 = NULL;
 
@@ -76,21 +77,21 @@ void Init_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
 
 void Imprime_Baralho(LISTA_CARTAS_PTR Lista_Carta){
     while(Lista_Carta != NULL){
-        g_print("%2d | %2d  (%c, %c)\n", Lista_Carta->numero, Lista_Carta->naipe, int_2_hexa(Lista_Carta->numero), Int_2_Naipe(Lista_Carta->naipe));
+        g_print("%2d | %2d  (%c, %c) inte: %d\n", Lista_Carta->numero, Lista_Carta->naipe, int_2_hexa(Lista_Carta->numero), Int_2_Naipe(Lista_Carta->naipe),Lista_Carta->interacao);
         Lista_Carta = Lista_Carta->prox;
     }
     g_print("\n\n\n");
 }
 
-void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel, int Interacao){
+void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel, char interacao){
     srand(time(NULL));
     int Numero, Naipe;
     for(Naipe = 1; Naipe < 5; Naipe++){
         for(Numero = 1; Numero < 14; Numero++){
-            Cria_Carta(Baralho, Naipe, Numero, Painel, Interacao);
+            Cria_Carta(Baralho, Naipe, Numero, Painel, interacao);
         }
     }
-    Cria_Carta(Baralho, JOKER, JOKER, Painel, Interacao);
+    Cria_Carta(Baralho, JOKER, JOKER, Painel, interacao);
     Imprime_Baralho(*Baralho);
 
     for(Naipe = 1; Naipe < 5; Naipe++){
@@ -234,6 +235,7 @@ void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd){
     atual->Sua_Vez = 1;
     atual->prox = NULL;
     atual->cartas = NULL;
+    atual->Ja_Comprou = 0;
     atual->Jogada_Inicial = 1;
     Insere_Img_Jogador(atual);
 
@@ -244,6 +246,7 @@ void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd){
         atual->Id = i;
         atual->Sua_Vez = 0;
         atual->cartas = NULL;
+        atual->Ja_Comprou = 0;
         atual->Jogada_Inicial = 1;
         Insere_Img_Jogador(atual);
 
@@ -255,11 +258,12 @@ void criar_jogadores (JOGADORES_PTR *Lista_Jogadores, int Qtd){
 }
 
 void Pixel_2_LinCol(int *lin, int *col, int x, int y, int Inicio_x, int Inicio_y, int Tam_x, int Tam_y){
+    g_print("\t Pixel_2_LinCol:\n");
     y += TAM_Y_CARTA/2;
     x += TAM_X_CARTA/2;
     
-    int Espaco_X_Carta = Tam_x;
-    int Espaco_Y_Carta = Tam_y;
+    Inicio_y += TAM_Y_CARTA/2;
+    Inicio_x += TAM_X_CARTA/2;
 
     int Pos_X_Carta = x - Inicio_x;
     int Pos_Y_Carta = y - Inicio_y;
@@ -269,11 +273,15 @@ void Pixel_2_LinCol(int *lin, int *col, int x, int y, int Inicio_x, int Inicio_y
     if(Pos_Y_Carta < 0)
         Pos_Y_Carta = 0;
 
-    int coluna = Pos_X_Carta / Espaco_X_Carta;
-    int linha  = Pos_Y_Carta / Espaco_Y_Carta;
+    int coluna = Pos_X_Carta / Tam_x;
+    int linha  = Pos_Y_Carta / Tam_y;
 
-    int dir = (Pos_X_Carta % Espaco_X_Carta > Espaco_X_Carta/2) ? 1 : 0;
-    int inf = (Pos_Y_Carta % Espaco_Y_Carta > Espaco_Y_Carta/1.5) ? 1 : 0;
+    g_print("\t lin1: %d, col1: %d, Pos X: %d, Pos Y: %d\n", linha, coluna, Pos_X_Carta, Pos_Y_Carta);
+ 
+
+    int dir = ((Pos_X_Carta % Tam_x) > (Tam_x/2.5)) ? 1 : 0;
+    int inf = ((Pos_Y_Carta % Tam_y) > (Tam_y/1.5)) ? 1 : 0;
+    g_print("\t lin2: %d, col2: %d, Pos_P_Tam_X: %d, Pos_P_Tam_Y: %d, Tam_x: %d, Tam_y: %d\n", linha, coluna, (Pos_X_Carta % Tam_x), (Pos_Y_Carta % Tam_y), Tam_x, Tam_y);
 
     if (dir)
         coluna++;
@@ -283,17 +291,25 @@ void Pixel_2_LinCol(int *lin, int *col, int x, int y, int Inicio_x, int Inicio_y
     if(coluna > N_MAX_COLUNAS)
         coluna = N_MAX_COLUNAS;
 
+    g_print("\t lin3: %d, col3: %d:\n", linha, coluna);
+
     *lin = linha;
     *col = coluna;
 }
 
 void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int linha, int coluna){
+    g_print("\t\t Entrou LinCol_2_Monte\n");
     LISTA_MESA_PTR prev = NULL;
     LISTA_MESA_PTR Atual = *Mesa;
     
     if(Atual == NULL || Atual->y > linha || (Atual->y == linha && Atual->x > coluna)){
         *Monte = *Mesa;
         *pos = -1;
+        g_print("\t\t ");
+        if (*Monte != NULL)
+            g_print("*Monte: x: %d, y: %d  | ", (*Monte)->x, (*Monte)->y);
+        g_print("pos: %d\n", *pos);
+        g_print("\t\t Saida 1 LinCol_2_Monte\n\n");
         return;
     }
 
@@ -309,11 +325,26 @@ void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int l
     if(Atual != NULL && (Atual->y == linha && Atual->x <= coluna && Atual->x+Atual->N_Cartas + 1 >= coluna)){
         *Monte = Atual;
         *pos = coluna - Atual->x;
+        g_print("\t\t ");
+        if (Atual != NULL)
+            g_print("Atual: x: %d, y: %d  | ", Atual->x, Atual->y);
+        g_print("pos: %d\n", *pos);
+        g_print("\t\t Saida 2 LinCol_2_Monte\n\n");
         return;
     }
     else if(prev != NULL && (prev->y == linha && prev->x <= coluna && prev->x+prev->N_Cartas + 1 >= coluna)){
         *Monte = prev;
-        *pos = coluna - prev->x;
+        // if (prev != NULL && prev->x+prev->N_Cartas == coluna)
+        //     *pos = -1;
+        // else
+            *pos = coluna - prev->x;
+
+        g_print("\t\t ");
+        if ((*Monte) != NULL)
+            g_print("Monte: x: %d, y: %d  | ", (*Monte)->x, (*Monte)->y);
+        g_print("pos: %d\n", *pos);
+        g_print("\t\t Saida 3 LinCol_2_Monte\n\n");
+
         return;
     }
 
@@ -322,17 +353,23 @@ void LinCol_2_Monte(LISTA_MESA_PTR *Monte, LISTA_MESA_PTR *Mesa, int *pos, int l
         *Monte = Atual;
     else    
         *Monte = prev;
+        
+    g_print("\t\t ");
+    if ((*Monte) != NULL)
+        g_print("Monte: x: %d, y: %d  | ", (*Monte)->x, (*Monte)->y);
+    g_print("pos: %d\n", *pos);
+    g_print("\t\t Saida 4 LinCol_2_Monte\n\n");
 }
 
 
-JOGADORES_PTR Jogador_Atual(JOGADORES_PTR *Lista_Jogadores){
-    if(*Lista_Jogadores == NULL)
+JOGADORES_PTR Jogador_Atual(JOGADORES_PTR Lista_Jogadores){
+    if(Lista_Jogadores == NULL)
         return NULL;
-    JOGADORES_PTR atual = *Lista_Jogadores;
-    while(!atual->Sua_Vez)
-        atual = atual->prox;
+        
+    while(!Lista_Jogadores->Sua_Vez)
+        Lista_Jogadores = Lista_Jogadores->prox;
     
-    return atual;
+    return Lista_Jogadores;
 }
 
 void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista){
@@ -435,9 +472,19 @@ void Organiza_Mesa(LISTA_MESA_PTR *Mesa){
     int linha = 0;
     int coluna = 0;
 
+    LISTA_CARTAS_PTR Cartas;
     LISTA_MESA_PTR mesa_atual = *Mesa;
+    int conta_cartas = 0;
 
     while(mesa_atual != NULL){
+        conta_cartas = 0;
+        Cartas = mesa_atual->cartas;
+        while(Cartas != NULL){
+            conta_cartas++;
+            Cartas = Cartas->prox;
+        }
+        mesa_atual->N_Cartas = conta_cartas;
+
         if (coluna + mesa_atual->N_Cartas > N_MAX_COLUNAS && coluna != 0){
             coluna = 0;
             linha++;
@@ -491,14 +538,15 @@ int Hexa_2_int(char Hexa){
     return (int)Numero;
 }
 
-void EventBox_2_Carta(GtkWidget *EventBox, int *Naipe, int *Numero){
-    char *nome;// = (char*)malloc(10*sizeof(char)); memset(nome, 0, sizeof(char)*10);
+void EventBox_2_Carta(GtkWidget *EventBox, int *Naipe, int *Numero, char *interacao){
+    char *nome;
     nome = (char*)gtk_widget_get_name(EventBox);
-
-    //g_print("n3: %c, n4: %c\n", )
 
     *Numero = Hexa_2_int (nome[3]);
     *Naipe = Naipe_2_int (nome[4]);
+    *interacao = Hexa_2_int (nome[0]);
+    g_print("\t\t EventBox_2_Carta: %s\n", nome);
+    g_print("\t\t Na: %d, nu: %d, inte: %d\n\n", *Naipe, *Numero, *interacao);
 }
 
 void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR *Baralho, LISTA_CARTAS_PTR *Backup_mao){
@@ -511,39 +559,16 @@ void cria_mao_jogadores(JOGADORES_PTR *Lista_Jogadores, LISTA_CARTAS_PTR *Baralh
   }
   atual = atual->prox;
 
-
-    g_print("\n\n48000000:\n");
-    Imprime_Baralho(*Baralho);
-    g_print("jogador: \n");
-    if((*Lista_Jogadores) != NULL)
-      Imprime_Baralho((*Lista_Jogadores)->cartas);
-    g_print("fim jogador\n");
-
   while(prev_id < atual->Id){
     for(cont = 0; cont < 14; cont++){
       Baralho_2_mao(Baralho, &(atual->cartas));
     }
     prev_id = atual->Id;
     atual = atual->prox;
-
-    g_print("\n\n45000000:\n");
-    Imprime_Baralho(*Baralho);
-    g_print("jogador: \n");
-    if((*Lista_Jogadores) != NULL)
-      Imprime_Baralho((*Lista_Jogadores)->cartas);
-    g_print("fim jogador\n");
-
   }
   //Inverte_Lista(&(atual->cartas));
 
   *Backup_mao = duplica_Cartas(&(atual->cartas));
-
-    g_print("\n\n48000000:\n");
-    Imprime_Baralho(*Baralho);
-    g_print("jogador: \n");
-    if((*Lista_Jogadores) != NULL)
-      Imprime_Baralho((*Lista_Jogadores)->cartas);
-    g_print("fim jogador\n");
 }
 
 
@@ -606,7 +631,7 @@ int fim_do_jogo(LISTA_CARTAS_PTR *baralho_compras, JOGADORES_PTR *lista_jogadore
 }
 
 //retorna o id, se for -1 se o jogo ainda nao acabou, erro
-int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
+int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_CARTAS_PTR *lista_baralho){
     JOGADORES_PTR jog1 = *lista_jogadores;
     jog1 = jog1->prox;
     //conta os jogadores
@@ -617,12 +642,8 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
     }
     //reseta a posicao
     jog1 = *lista_jogadores;
-
-
-    int pontuacoes[qtd_jogadores];
-    for (int i=0; i<qtd_jogadores; i++){
-        pontuacoes[i] = 0;
-    }
+    
+    int pontuacoes[qtd_jogadores]; memset(pontuacoes, 0, sizeof(int)*qtd_jogadores);
 
     //verifica se algum deles esta sem cartas, alem disso soma as pontuacoes
     LISTA_CARTAS_PTR cartas = NULL;
@@ -639,12 +660,13 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
         }
         jog1 = jog1->prox;
     }
-    LISTA_MESA_PTR baralho = *lista_baralho;
+
+    LISTA_CARTAS_PTR baralho = *lista_baralho;
     int id_do_menor = -1;
     if (baralho == NULL){  //se tiver acabado as cartas de comprar
         //acha a menor soma de pontos e retorna como vencedor este jogador
         id_do_menor = -1;
-        int menor_pontuacao = JOKER;
+        int menor_pontuacao = INT_MAX;
         for (int i=0; i<qtd_jogadores; i++){
             if (pontuacoes[i] < menor_pontuacao){
                 id_do_menor = i;
@@ -661,18 +683,23 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
 //pega dois ponteiros de mesas, a antes da modificacao e a apos, ja supoe que sao validas e subtrai os pontos, se for maior que 30 ok
 //0: invalido; 1:valido
 int valida_jogada (JOGADORES_PTR Jogador, LISTA_CARTAS_PTR *Backup_Mao, LISTA_MESA_PTR *mesa_backup, LISTA_MESA_PTR *mesa_nova){
-    LISTA_CARTAS_PTR Backup_atual = *Backup_Mao;
-    while(Backup_atual != NULL){
-        if(Busca_Carta(&(Jogador->cartas), Backup_atual->naipe, Backup_atual->numero) == NULL)
-            break;
+    LISTA_CARTAS_PTR check = *Backup_Mao;
+    LISTA_CARTAS_PTR compara = Jogador->cartas;
+    while(check != NULL){
+        if(Busca_Carta(&compara, check->naipe, check->numero, check->interacao) == NULL)
+             break;
         
-        Backup_atual = Backup_atual->prox;
+        check = check->prox;
     }
-    if(Backup_atual == NULL)
-        return 0;
+    if(check == NULL && Jogador->Ja_Comprou != 1){
+        g_print("Jogada invalida pelo backup\n");
+         return 0;
+    }
 
-    if (Jogador->Jogada_Inicial == 0)
+    if (Jogador->Jogada_Inicial == 0 || Jogador->Ja_Comprou == 1)
         return 1;
+
+    g_print("verificando priemira jogada\n");
 
     int pont_mesa1 = 0;
     int pont_mesa2 = 0;
@@ -733,16 +760,18 @@ LISTA_CARTAS_PTR duplica_Cartas(LISTA_CARTAS_PTR *Origem){
     temp->numero = atual->numero;
     temp->img = atual->img;
     temp->prox = NULL;
+    temp->interacao = atual->interacao;
     destino = temp;  
 
     atual = atual->prox;
     while(atual != NULL){
         prev_temp = temp;
         temp = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
+        temp->prox = NULL;
+        temp->img  = atual->img;
         temp->naipe = atual->naipe;
         temp->numero = atual->numero;
-        temp->img = atual->img;
-        temp->prox = NULL;
+        temp->interacao = atual->interacao;
 
         prev_temp->prox = temp;
         atual = atual->prox;
@@ -782,19 +811,18 @@ LISTA_MESA_PTR duplicar_mesa (LISTA_MESA_PTR *lista_mesa){
         LISTA_CARTAS_PTR atual_cartas = atual_mesa->cartas;
         LISTA_CARTAS_PTR nova_carta1 = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
 
+        nova_carta1->img = atual_cartas->img;
         nova_carta1->naipe = atual_cartas->naipe;
         nova_carta1->numero = atual_cartas->numero;
+        nova_carta1->interacao = atual_cartas->interacao;
 
         nova_mesa->cartas = nova_carta1;
         atual_cartas = atual_cartas->prox;
         while (atual_cartas != NULL){
-            printf("6\n");
             nova_carta2 = (LISTA_CARTAS_PTR)malloc(sizeof(LISTA_CARTAS));
-            printf("a\n");
             nova_carta2->naipe = atual_cartas->naipe;
-            printf("b\n");
             nova_carta2->numero = atual_cartas->numero;
-            printf("c\n");
+            nova_carta2->interacao = atual_cartas->interacao;
             nova_carta1->prox = nova_carta2;
             nova_carta1 = nova_carta2;
             atual_cartas = atual_cartas->prox;
@@ -1064,7 +1092,7 @@ void Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
         if (Leitura == -1)
             break;
 
-        int interacao = (Busca_Carta(Baralho, Naipe, Numero) == NULL) ? 1 : 2;
+        char interacao = (Busca_Carta(Baralho, Naipe, Numero, 1) == NULL) ? 1 : 2;
         Cria_Carta(Baralho, Naipe, Numero, Painel, interacao);
     }
 

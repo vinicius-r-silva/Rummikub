@@ -43,21 +43,24 @@ void move_imagem(GtkWidget *image,int descola_X, int descola_Y){
 GtkWidget* Insere_Carta_Interface(int Naipe, int Valor, GtkWidget *Painel, char Interacao){
   GtkWidget *img_carta;
   GtkWidget *event_box;
+  g_print("\t\t Insere_Carta_Interface\n");
 
   char V = int_2_hexa(Valor);
   char N = Int_2_Naipe(Naipe);
 
   char resultado[27]; memset(resultado, 0, sizeof(char)*27);
   sprintf(resultado,"src/image/cartas/%c%c.png",V,N);
-  //g_print("N: %2d (%c), V: %2d (%c)\n", Naipe, N, Valor, V);
+  g_print("\t\t N: %2d (%c), V: %2d (%c), inte %d\n", Naipe, N, Valor, V, Interacao);
 
   char NomeCarta[6];
-  sprintf(NomeCarta,"%cC_%c%c",Interacao, V, N);
+  sprintf(NomeCarta,"%dC_%c%c",Interacao, V, N);
   NomeCarta[5] = '\0';
 
   char NomeEventBox[6];
-  sprintf(NomeEventBox,"%cE_%c%c",Interacao, V,N);
+  sprintf(NomeEventBox,"%dE_%c%c",Interacao, V,N);
   NomeEventBox[5] = '\0';
+
+  g_print("\t\t Nomes: %s - %s\n\n", NomeCarta, NomeEventBox);
 
   event_box = gtk_event_box_new();
   gtk_fixed_put(GTK_FIXED(Painel), event_box,0, 0);
@@ -150,7 +153,7 @@ void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
 }
 
 void fecha_bem_vindo(GtkDialog *dialog, gint response_id, gpointer callback_params){
-  JOGADORES_PTR Jogador = Jogador_Atual(&Lista_Jogadores);
+  JOGADORES_PTR Jogador = Jogador_Atual(Lista_Jogadores);
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
   Imprime_Baralho(Jogador->cartas);
   Imprime_Baralho(Baralho_Global);

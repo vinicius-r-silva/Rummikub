@@ -106,33 +106,15 @@ void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){
 
   if(data->bt_ativo > 1){
     gtk_widget_destroy((data->obj_home));
-    g_print("\n\n45000000:\n");
-    Imprime_Baralho(data->Baralho);
-    g_print("jogador: \n");
-    if(Lista_Jogadores != NULL)
-      Imprime_Baralho(Lista_Jogadores->cartas);
-    g_print("fim jogador\n");
 
     criar_jogadores(&Lista_Jogadores,data->bt_ativo);
     cria_mao_jogadores(&Lista_Jogadores, &(data->Baralho), data->Backup_Mao);
-
-    g_print("\n\n5000000:\n");
-    Imprime_Baralho(data->Baralho);
-    g_print("jogador: \n");
-    Imprime_Baralho(Lista_Jogadores->cartas);
-    g_print("fim jogador\n");
     
 
     //Imprime_mao_jogador(&(Lista_Jogadores->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
     tela_bem_vindo();
     atualiza_janela();
     *(data->Lista_Jogadores) = Lista_Jogadores;
-
-    g_print("\n\n54500000:\n");
-    Imprime_Baralho(data->Baralho);
-    g_print("jogador: \n");
-    Imprime_Baralho(Lista_Jogadores->cartas);
-    g_print("fim jogador\n");
     Baralho_Global = data->Baralho;
   }
   else{
@@ -185,31 +167,37 @@ void constroi_janela_jogo(GtkWidget *window){
 }
 
 //Adiciona botões no jogo e seus eventos
-void cria_botoes_jogo(GtkWidget *bt_compra_carta, GtkWidget *bt_finaliza_jog){
-  //Cria botão de COMPRA CARTAS
-  bt_compra_carta = gtk_button_new_with_label("");
-  gtk_fixed_put(GTK_FIXED(fixed), bt_compra_carta, 20,420);
-  gtk_widget_set_size_request(bt_compra_carta, 88, 60);
-  gtk_widget_set_name(bt_compra_carta,"bt_compra_carta");
+
+void cria_botoes_jogo(GtkWidget **bt_compra_carta, GtkWidget **bt_finaliza_jog){
+  GtkWidget *Bt_Compra = NULL;
+  GtkWidget *Bt_finaliza = NULL;
+//Cria botão de COMPRA CARTAS
+  Bt_Compra = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(fixed), Bt_Compra, 20,420);
+  gtk_widget_set_size_request(Bt_Compra, 88, 60);
+  gtk_widget_set_name(Bt_Compra,"bt_compra_carta");
   
   //Adiciona a class para o botão COMPRA CARTAS
-  GtkStyleContext *context_bt1 = gtk_widget_get_style_context(bt_compra_carta);
+  GtkStyleContext *context_bt1 = gtk_widget_get_style_context(Bt_Compra);
   gtk_style_context_add_class(context_bt1,"bt_compra_carta");
     
   //Evento que realiza COMPRA CARTAS para o usuario
-  g_signal_connect(G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(comprar_cartas_user), NULL); 
-
-  //Cria botão de FINALIZAR JOGADA
-  bt_finaliza_jog = gtk_button_new_with_label("");
-  gtk_fixed_put(GTK_FIXED(fixed), bt_finaliza_jog, 20,485);
-  gtk_widget_set_size_request(bt_finaliza_jog, 88, 65);
-  gtk_widget_set_name(bt_finaliza_jog,"bt_finaliza_jog");
+   g_signal_connect(G_OBJECT(Bt_Compra),"button_press_event",G_CALLBACK(comprar_cartas_user), NULL); 
   
-  GtkStyleContext *context_bt2 = gtk_widget_get_style_context(bt_finaliza_jog);
+  //Cria botão de FINALIZAR JOGADA
+  Bt_finaliza = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(fixed), Bt_finaliza, 20,485);
+  gtk_widget_set_size_request(Bt_finaliza, 88, 65);
+  gtk_widget_set_name(Bt_finaliza,"bt_finaliza_jog");
+  
+
+  GtkStyleContext *context_bt2 = gtk_widget_get_style_context(Bt_finaliza);  
   gtk_style_context_add_class(context_bt2,"bt_finaliza_jog");
   
   //Evento que realiza FINALIZAR JOGADA para o usuario
-  g_signal_connect(G_OBJECT(bt_finaliza_jog),"button_press_event",G_CALLBACK(finaliza_jogada_user), NULL); 
+  g_signal_connect(G_OBJECT(Bt_finaliza),"button_press_event",G_CALLBACK(finaliza_jogada_user), NULL); 
+  *bt_compra_carta = Bt_Compra;
+  *bt_finaliza_jog = Bt_finaliza; 
 }
 
 //Função para criar imagens do jogo

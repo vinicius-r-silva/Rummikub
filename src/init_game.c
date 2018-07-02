@@ -90,6 +90,7 @@ void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores, LISTA_C
   bts_n_jog->Baralho = Baralho;
   bts_n_jog->Backup_Mao = Backup_Mao;
   bts_n_jog->Lista_Jogadores = Lista_Jogadores;
+  atualiza_janela();
 
   //
   g_signal_connect(G_OBJECT(n_jogador2),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog); 

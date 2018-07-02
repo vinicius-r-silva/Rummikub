@@ -25,13 +25,18 @@ void tela_erro_jogada();
 
 //Cria tela ganhador do jogo
 void tela_ganhador(int jogador);
+void tela_empate();
 
 //Desabilita botão de comprar carta
-void bt_desabilita_compra(GtkWidget *widget, gpointer data);
+void bt_desabilita_compra();
+void bt_habilita_compra();
 
 //Altera botão nova jogada para iniciar outro jogador
 void troca_bt_jogador();
 
 void Oculta_mao_Jogador(JOGADORES_PTR Jogador);
+void tela_proximo_jogador(int jogador);
+void tela_erro_arquivo();
+void tela_tipo_entrada();
 
 #endif //INTERFACE_H

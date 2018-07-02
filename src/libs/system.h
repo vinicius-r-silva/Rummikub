@@ -10,6 +10,7 @@
 
 #include "data.h"
 #include "interface.h"
+#include "init_game.h"
 
 
 void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel, char Interacao);
@@ -35,7 +36,8 @@ int Cartas_Mao(int *x, int *y, GtkWidget **Img, int pos, LISTA_CARTAS_PTR atual)
 void mao_2_monte(LISTA_CARTAS_PTR *mao, LISTA_MESA_PTR *mesa, int Naipe, int Numero, int Pos, bool Nova_Lista);
 void EventBox_2_Carta(GtkWidget *EventBox, int *Naipe, int *Numero, char *interacao);
 
-void Organiza_Mesa(LISTA_MESA_PTR *Mesa);void Deleta_Lista(LISTA_CARTAS_PTR *Lista);
+void Organiza_Mesa(LISTA_MESA_PTR *Mesa);
+void Deleta_Lista(LISTA_CARTAS_PTR *Lista);
 
 void Deleta_Mesa(LISTA_MESA_PTR *Mesa);
 //1: SIM; 0: NAO; -1: ERRO
@@ -55,7 +57,8 @@ LISTA_CARTAS_PTR duplica_Cartas (LISTA_CARTAS_PTR *Origem);
 
 void Inverte_Lista(LISTA_CARTAS_PTR *Lista);
 
-void Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel);
+int Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel);
 void Imprime_Baralho(LISTA_CARTAS_PTR Lista_Carta);
+void escolha_tipo_entrada(GtkWidget *bt, gint response_id, gpointer data);
 
 #endif //SYSTEM_H

@@ -22,25 +22,6 @@ LISTA_CARTAS_PTR Mao_Backup;
 JOGADORES_PTR Lista_Jogadores;
 LISTA_CARTAS_PTR Baralho_Global;
 
-void Imprime(LISTA_CARTAS_PTR Lista_Carta){
-    while(Lista_Carta != NULL){
-        g_print("%d | %d\n", Lista_Carta->numero, Lista_Carta->naipe);
-        Lista_Carta = Lista_Carta->prox;
-    }
-    g_print("\n\n\n");
-}
-
-void Imprime_Jodagores(JOGADORES_PTR Lista_Jogadores){
-  if (Lista_Jogadores == NULL)
-    return;
-
-  while(Lista_Jogadores->Id < Lista_Jogadores->prox->Id){
-    printf("%d\n", Lista_Jogadores->Id);
-    Lista_Jogadores = Lista_Jogadores->prox;
-  }
-  printf("%d\n\n\n", Lista_Jogadores->Id);
-}
-
 int main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);//pega endereços dos parametros
   init_mouse();
@@ -63,19 +44,19 @@ int main(int argc, char *argv[]) {
   carrega_estilo_jogo(); //carrega dados para criar o estilo do jogo
   ///////////////////////////////////////////////////////////////////////////////
   
-  Baralho_Global = NULL;
   Mesa = NULL;
-  Mesa_Backup = NULL;
   Mao_Backup = NULL;
-  //Init_Baralho(&Baralho, fixed);
-  Carrega_Baralho(&Baralho_Global, fixed);
+  Mesa_Backup = NULL;
+  Baralho_Global = NULL;
   Lista_Jogadores = NULL;
+  //Init_Baralho(&Baralho_Global, fixed);
+  //Carrega_Baralho(&Baralho_Global, fixed);
 
 
   cria_botoes_jogo(&bt_compra_carta, &bt_finaliza_jog); //carrega botões no jogo
 
-  tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
-
+  //tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
+  tela_tipo_entrada();
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
 
   g_object_unref(icon);
@@ -83,6 +64,11 @@ int main(int argc, char *argv[]) {
   gtk_main(); //cria janela 
 
   excluir_jogadores(&Lista_Jogadores);
+  Deleta_Mesa(&Mesa);
+  Deleta_Mesa(&Mesa_Backup);
+  Deleta_Lista(&Baralho_Global);
+  Deleta_Lista(&Mao_Backup);
+
   //Deleta Jodares
   //Deletea Mesa
   return 0;

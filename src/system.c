@@ -43,17 +43,19 @@ void TrocaCarta(LISTA_CARTAS_PTR *Baralho, int Naipe_1, int Naipe_2, int Num_1, 
     if(Carta1 != NULL){
         Carta1->numero = Num_2;
         Carta1->naipe = Naipe_2;
+        Carta1->interacao = inte2;
         Img1 = Carta1->img;
     } else
-        printf("Erro: Carta 1 não  encontrada\n");
+        printf("Erro: Carta 1 não  encontrada. Na: %d, Nu: %d, inte: %d\n", Naipe_1, Num_1, inte1);
 
     if(Carta2 != NULL){
         Img2 = Carta2->img;
         Carta2->img = Img1;
         Carta2->numero = Num_1;
         Carta2->naipe = Naipe_1;
+        Carta2->interacao = inte1;
     }else
-        printf("Erro: Carta 2 não encontrada\n");
+        printf("Erro: Carta 2 não encontrada. Na: %d, Nu: %d, inte: %d\n", Naipe_2, Num_2, inte2);
 
     if(Carta1 != NULL)
         Carta1->img = Img2;
@@ -63,8 +65,8 @@ void Init_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
     LISTA_CARTAS_PTR Baralho1 = NULL;
     LISTA_CARTAS_PTR Baralho2 = NULL;
 
-    Cria_Baralho(&Baralho1, Painel, '1');
-    Cria_Baralho(&Baralho2, Painel, '2');
+    Cria_Baralho(&Baralho1, Painel, 1);
+    Cria_Baralho(&Baralho2, Painel, 2);
 
     LISTA_CARTAS_PTR atual = Baralho1;
     while(atual->prox != NULL)
@@ -72,6 +74,22 @@ void Init_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
 
     atual->prox = Baralho2;
     *Baralho = Baralho1;
+
+    g_print("Imprime baralho:\n");
+    Imprime_Baralho(*Baralho);
+    g_print("fim imprime baralho\n\n");
+
+    int i, Naipe, Numero, interacao;
+    for (i = 0; i < 10; i++){
+        for(Naipe = 1; Naipe < 5; Naipe++){
+            for(Numero = 1; Numero < 14; Numero++){
+                interacao = rand() % 2;
+                TrocaCarta(Baralho, Naipe, rand() % 4 + 1 ,Numero, rand() % 13 + 1, interacao+1, !interacao+1);
+            }
+        }
+        //TrocaCarta(Baralho, JOKER, rand() % 4 + 1 , JOKER, rand() % 13 + 1, interacao+1, !interacao+1);
+    }
+    g_print("Fim Init Trabalho\n\n");
 }
 
 
@@ -93,13 +111,15 @@ void Cria_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel, char interacao){
     }
     Cria_Carta(Baralho, JOKER, JOKER, Painel, interacao);
     Imprime_Baralho(*Baralho);
-
-    for(Naipe = 1; Naipe < 5; Naipe++){
-        for(Numero = 1; Numero < 14; Numero++){
-            //TrocaCarta(Baralho, Naipe, rand() % 4 + 1 ,Numero, rand() % 13 + 1);
+    int i;
+    for (i = 0; i < 10; i++){
+        for(Naipe = 1; Naipe < 5; Naipe++){
+            for(Numero = 1; Numero < 14; Numero++){
+                TrocaCarta(Baralho, Naipe, rand() % 4 + 1 ,Numero, rand() % 13 + 1, interacao, interacao);
+            }
         }
+        TrocaCarta(Baralho, JOKER, rand() % 4 + 1 , JOKER, rand() % 13 + 1, interacao, interacao);
     }
-    //TrocaCarta(Baralho, JOKER, rand() % 4 + 1 , JOKER, rand() % 13 + 1);
 }
 
 
@@ -630,7 +650,7 @@ int fim_do_jogo(LISTA_CARTAS_PTR *baralho_compras, JOGADORES_PTR *lista_jogadore
     }
 }
 
-//retorna o id, se for -1 se o jogo ainda nao acabou, erro
+//retorna o id, se for -1 se o jogo ainda nao acabou; retorna -2 se der empate
 int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_CARTAS_PTR *lista_baralho){
     JOGADORES_PTR jog1 = *lista_jogadores;
     jog1 = jog1->prox;
@@ -642,8 +662,12 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_CARTAS_PTR *lista_baralho){
     }
     //reseta a posicao
     jog1 = *lista_jogadores;
-    
-    int pontuacoes[qtd_jogadores]; memset(pontuacoes, 0, sizeof(int)*qtd_jogadores);
+
+
+    int pontuacoes[qtd_jogadores];
+    for (int i=0; i<qtd_jogadores; i++){
+        pontuacoes[i] = 0;
+    }
 
     //verifica se algum deles esta sem cartas, alem disso soma as pontuacoes
     LISTA_CARTAS_PTR cartas = NULL;
@@ -651,7 +675,7 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_CARTAS_PTR *lista_baralho){
         if (jog1->cartas == NULL) return jog1->Id;
         cartas = jog1->cartas;
         while(cartas != NULL){
-            if (cartas->numero == JOKER){ //o coringa vale 20 pontos, segundo as regras
+            if (cartas->numero == INT_MAX){ //o coringa vale 20 pontos, segundo as regras
                 pontuacoes[i] += 20;
             } else {
                 pontuacoes[i] += cartas->numero;
@@ -660,7 +684,6 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_CARTAS_PTR *lista_baralho){
         }
         jog1 = jog1->prox;
     }
-
     LISTA_CARTAS_PTR baralho = *lista_baralho;
     int id_do_menor = -1;
     if (baralho == NULL){  //se tiver acabado as cartas de comprar
@@ -668,6 +691,9 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_CARTAS_PTR *lista_baralho){
         id_do_menor = -1;
         int menor_pontuacao = INT_MAX;
         for (int i=0; i<qtd_jogadores; i++){
+            if (pontuacoes[i] == menor_pontuacao){ //se houver empate
+                return -2;
+            }
             if (pontuacoes[i] < menor_pontuacao){
                 id_do_menor = i;
                 menor_pontuacao = pontuacoes[i];
@@ -851,7 +877,6 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //se tiver menos de 3 cartas sera invalido
         if (qtd_cartas < 3) return 0;
 
-
         monte1 = atual_mesa->cartas;   //reseta para a primera posicao do monte
         LISTA_CARTAS_PTR monte2 = atual_mesa->cartas;
         monte2 = monte2->prox;
@@ -948,8 +973,6 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
             if (monte_clone[i].naipe != JOKER) 
                 usado[monte_clone[i].naipe] = 1;
         }*/
-
-
         int jokers_restante = -1;
         switch (tipo){
         case 1:
@@ -1064,14 +1087,12 @@ void Inverte_Lista(LISTA_CARTAS_PTR *Lista){
         *Lista = prev;
 }
 
-void Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
+int Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
     Deleta_Lista(Baralho);
 
     FILE *Arquivo = fopen(LOCAL_FILE_BARALHO, "r");
-    if(Arquivo == NULL){
-        printf("Erro ao abrir o arquivo\n");
-        return;
-    }
+    if(Arquivo == NULL)
+        return 0;
 
     int Naipe;
     int Numero;
@@ -1097,4 +1118,5 @@ void Carrega_Baralho(LISTA_CARTAS_PTR *Baralho, GtkWidget *Painel){
     }
 
     Inverte_Lista(Baralho);
+    return 1;
 }

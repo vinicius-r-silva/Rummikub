@@ -5,9 +5,10 @@ extern GtkWidget *window;
 extern GtkWidget *bt_compra_carta;
 extern GtkWidget *bt_finaliza_jog;
 
-extern LISTA_CARTAS_PTR Baralho_Global;
-
+extern LISTA_MESA_PTR Mesa;
+extern LISTA_CARTAS_PTR Mao_Backup;
 extern JOGADORES_PTR Lista_Jogadores;
+extern LISTA_CARTAS_PTR Baralho_Global;
 
 void atualiza_janela(){
   gtk_widget_show_all(window);
@@ -98,10 +99,15 @@ void Coloca_Borda_Jogador(JOGADORES_PTR Jogador){
   sprintf(Caminho,"src/image/user%d_foco.png",Jogador->Id+1);
 
   gtk_image_set_from_file(GTK_IMAGE(Jogador->img), Caminho);
+  Jogador = Jogador->prox;
+  while(Jogador->Sua_Vez == 0)
+    Jogador = Jogador->prox;
+  
+  Jogador->Sua_Vez = 0;
 }
 
 void Tira_Borda_Jogador(JOGADORES_PTR Jogador){
-  Jogador->Sua_Vez = 0;
+  //Jogador->Sua_Vez = 0;
   char Caminho[40]; memset(Caminho, 0, sizeof(char)*40);
   sprintf(Caminho,"src/image/user%d.png",Jogador->Id+1);
 
@@ -146,9 +152,24 @@ void atualiza_cartas_mesa(LISTA_MESA_PTR *Lista_Mesas){
   }
 }
 
-void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
+void Faz_Nd(GtkDialog *dialog, gint response_id, gpointer callback_params){
+  return;
+}
 
+void fecha_tela(GtkDialog *dialog, gint response_id, gpointer callback_params){
   gtk_widget_destroy((callback_params));
+  //char *nome = (char*)gtk_widget_get_name(callback_params);
+  //if ()
+  return;
+}
+
+void fecha_tela_prox_jog(GtkDialog *dialog, gint response_id, gpointer callback_params){
+  g_print("entrou\n");
+  gtk_widget_destroy((callback_params));
+  JOGADORES_PTR atual = Jogador_Atual(Lista_Jogadores);
+  Coloca_Borda_Jogador(atual->prox);
+  Imprime_mao_jogador(&(atual->prox->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  // atualiza_janela();
   return;
 }
 
@@ -234,18 +255,22 @@ void tela_ganhador(int jogador){
 }
 
 
+
 //Desabilita botão de comprar carta
-void bt_desabilita_compra(GtkWidget *widget, gpointer data){
+void bt_desabilita_compra(){
   GtkStyleContext *context;
   context = gtk_widget_get_style_context(bt_compra_carta);
   gtk_style_context_add_class(context,"bt_compra_carta_db");
+  g_signal_connect(G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(Faz_Nd), NULL); 
 }
 
-//Altera botão nova jogada para iniciar outro jogador
-void troca_bt_jogador(){
+
+//Habilita compra de cartas
+void bt_habilita_compra(){
   GtkStyleContext *context;
-  context = gtk_widget_get_style_context(bt_finaliza_jog);
-  gtk_style_context_add_class(context,"bt_novo_jogador");
+  context = gtk_widget_get_style_context(bt_compra_carta);
+  gtk_style_context_remove_class(context,"bt_compra_carta_db");
+  g_signal_connect(G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(comprar_cartas_user), NULL); 
 }
 
 void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
@@ -256,3 +281,95 @@ void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
   }
 }
 
+
+void tela_empate(){
+  GtkWidget *tela_empate = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_empate, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_empate), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_empate");
+
+  //JOGADORES QUE EMPATARAM SERÃO CRIADOS AQUI
+  
+  GtkWidget *bt_final = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_empate), bt_final,447, 355);
+  gtk_widget_set_size_request(bt_final, 166, 46);
+  gtk_widget_set_name(bt_final,"bt_final");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_final),"button_press_event",G_CALLBACK(fecha_tela),tela_empate); 
+  atualiza_janela();
+}
+
+
+void tela_proximo_jogador(int jogador){
+  GtkWidget *tela_proximo = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_proximo, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_proximo), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_proximo");
+
+  char resultado[30]; memset(resultado, 0, sizeof(char)*27);
+  sprintf(resultado,"img_jogador_%d",jogador);
+
+  GtkWidget *img_jogador = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_proximo), img_jogador,370,175);
+  gtk_widget_set_size_request(img_jogador, 320, 80);
+  gtk_widget_set_name(img_jogador,resultado);
+
+  GtkWidget *bt_continuar = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_proximo), bt_continuar,370, 305);
+  gtk_widget_set_size_request(bt_continuar, 320, 67);
+  gtk_widget_set_name(bt_continuar,"bt_continuar");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_continuar),"button_press_event",G_CALLBACK(fecha_tela_prox_jog), tela_proximo); 
+  atualiza_janela();
+}
+
+void tela_erro_arquivo(){
+  GtkWidget *tela_erro_file = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_erro_file, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_erro_file), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_erro_file_entrada");
+
+  GtkWidget *bt_erro_file = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_erro_file), bt_erro_file,415, 380);
+  gtk_widget_set_size_request(bt_erro_file, 230, 67);
+  gtk_widget_set_name(bt_erro_file,"bt_erro_file");
+
+  g_signal_connect(G_OBJECT(bt_erro_file),"button_press_event",G_CALLBACK(escolha_tipo_entrada), tela_erro_file); 
+  atualiza_janela();
+}
+
+void tela_tipo_entrada(){
+  GtkWidget *tela_tipo = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_tipo, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_tipo), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_tipo_entrada");
+
+  GtkWidget *bt_sim = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_tipo), bt_sim,252, 320);
+  gtk_widget_set_size_request(bt_sim, 258, 75);
+  gtk_widget_set_name(bt_sim,"bt_sim");
+
+  GtkWidget *bt_nao = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_tipo), bt_nao,550, 320);
+  gtk_widget_set_size_request(bt_nao, 258, 75);
+  gtk_widget_set_name(bt_nao,"bt_nao");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_sim),"button_press_event",G_CALLBACK(escolha_tipo_entrada), tela_tipo); 
+  g_signal_connect(G_OBJECT(bt_nao),"button_press_event",G_CALLBACK(escolha_tipo_entrada), tela_tipo); 
+  atualiza_janela();
+}

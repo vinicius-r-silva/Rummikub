@@ -3,6 +3,8 @@
 int prev_X = 0;
 int prev_Y = 0;
 extern GdkDevice *mouse;
+extern GtkWidget *fixed;
+
 extern LISTA_MESA_PTR Mesa;
 extern LISTA_MESA_PTR Mesa_Backup;
 extern LISTA_CARTAS_PTR Mao_Backup;
@@ -351,6 +353,7 @@ void comprar_cartas_user(GtkWidget *widget, gpointer data){
   Jogador->Ja_Comprou = 1;
   Baralho_2_mao(&Baralho_Global, &(Jogador->cartas));
   Imprime_mao_jogador(&(Jogador->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  bt_desabilita_compra();
   atualiza_janela();
 
   return;
@@ -385,8 +388,7 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
   atual->Ja_Comprou = 0;
   Tira_Borda_Jogador(atual);
   Oculta_mao_Jogador(atual);
-  Coloca_Borda_Jogador(atual->prox);
-  Imprime_mao_jogador(&(atual->prox->cartas), 0, 0, INICIO_X_MAO, INICIO_Y_MAO);
+  
   
   Deleta_Mesa(&Mesa_Backup);
   Mesa_Backup = duplicar_mesa(&Mesa);
@@ -394,8 +396,39 @@ void finaliza_jogada_user(GtkWidget *widget, gpointer data){
   Deleta_Lista(&Mao_Backup);
   Mao_Backup = duplica_Cartas(&(atual->prox->cartas));
 
-  if (vencedor(&Lista_Jogadores, &Baralho_Global) != -1)
-    g_print("Acabou jogo\n");
+  int winer = vencedor(&Lista_Jogadores, &Baralho_Global);
+  if (winer!= -1){
+    if (winer > -1)
+      tela_ganhador(winer);
+    if (winer == -2)
+      tela_empate();
+  }
+
+  bt_habilita_compra();
+  tela_proximo_jogador(atual->prox->Id + 1);
     
   return;
+}
+
+void escolha_tipo_entrada(GtkWidget *bt, gint response_id, gpointer data){
+  gtk_widget_destroy(data);
+  const gchar *id_bt =  gtk_widget_get_name((bt));
+  if(strcmp(id_bt,"bt_sim") == 0){
+    if (Carrega_Baralho(&Baralho_Global, fixed) == 0){
+      tela_erro_arquivo();
+      atualiza_janela();
+    }
+  }
+  else if(strcmp(id_bt,"bt_nao") == 0){
+    Init_Baralho(&Baralho_Global, fixed);
+    tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
+  }
+  else if(strcmp(id_bt,"bt_erro_file") == 0){
+    g_print("NAOO ERRO FILE\n");
+    Init_Baralho(&Baralho_Global, fixed);
+    tela_home(Baralho_Global, &Lista_Jogadores, &Mao_Backup);
+  }
+  else{
+    return;
+  }
 }

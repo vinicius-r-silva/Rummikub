@@ -51,14 +51,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         //tipo 2: grupo (cartas de numeros iguais de naipes diferentes)
         //tipo 3: grupo com dois coringas e tres cartas, sem tipo nenhum, apenas e aceitavel
 
-        //verificacao de uso do naipe, utilizado no case 2
-        int usado[5]; //[0, 1, 2, 3, 4] 1-true, 0-false
-        //nao usa a posicao 0
 
-        //setando todos para false
-        for (int i=0; i<5; i++){
-            usado[i] = 0;
-        }
 
 
         /**----------VERIFICACAO DE TIPO-----------------------**/
@@ -132,9 +125,7 @@ int verifica_mesa(LISTA_MESA_PTR *lista_mesa){
         }
 //-----------------------------------------------------------------------------------------------------------------
 
-        for (int i=0; i< qtd_cartas; i++){
-            if (monte_clone[i].naipe != INF) usado[monte_clone[i].naipe] = 1;
-        }
+
 
         int jokers_restante = -1;
         switch (tipo){
@@ -772,7 +763,7 @@ int fim_do_jogo(LISTA_CARTAS_PTR *baralho_compras, JOGADORES_PTR *lista_jogadore
     }
 }
 
-//retorna o id, se for -1 se o jogo ainda nao acabou, erro
+//retorna o id, se for -1 se o jogo ainda nao acabou; retorna -2 se der empate
 int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
     JOGADORES_PTR jog1 = *lista_jogadores;
     jog1 = jog1->prox;
@@ -813,6 +804,9 @@ int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
         id_do_menor = -1;
         int menor_pontuacao = INF;
         for (int i=0; i<qtd_jogadores; i++){
+            if (pontuacoes[i] == menor_pontuacao){ //se houver empate
+                return -2;
+            }
             if (pontuacoes[i] < menor_pontuacao){
                 id_do_menor = i;
                 menor_pontuacao = pontuacoes[i];

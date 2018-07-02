@@ -1,0 +1,55 @@
+//retorna o id, se for -1 se o jogo ainda nao acabou; retorna -2 se der empate
+int vencedor(JOGADORES_PTR *lista_jogadores, LISTA_MESA_PTR *lista_baralho){
+    JOGADORES_PTR jog1 = *lista_jogadores;
+    jog1 = jog1->prox;
+    //conta os jogadores
+    int qtd_jogadores = 1;
+    while(jog1->id != 0){
+        qtd_jogadores++;
+        jog1 = jog1->prox;
+    }
+    //reseta a posicao
+    jog1 = *lista_jogadores;
+
+
+    int pontuacoes[qtd_jogadores];
+    for (int i=0; i<qtd_jogadores; i++){
+        pontuacoes[i] = 0;
+    }
+
+    //verifica se algum deles esta sem cartas, alem disso soma as pontuacoes
+    LISTA_CARTAS_PTR cartas = NULL;
+    for (int i=0; i<qtd_jogadores; i++){
+        if (jog1->cartas == NULL) return jog1->id;
+        cartas = jog1->cartas;
+        while(cartas != NULL){
+            if (cartas->numero == INF){ //o coringa vale 20 pontos, segundo as regras
+                pontuacoes[i] += 20;
+            } else {
+                pontuacoes[i] += cartas->numero;
+            }
+            cartas = cartas->prox;
+        }
+        jog1 = jog1->prox;
+    }
+    LISTA_MESA_PTR baralho = *lista_baralho;
+    int id_do_menor = -1;
+    if (baralho == NULL){  //se tiver acabado as cartas de comprar
+        //acha a menor soma de pontos e retorna como vencedor este jogador
+        id_do_menor = -1;
+        int menor_pontuacao = INF;
+        for (int i=0; i<qtd_jogadores; i++){
+            if (pontuacoes[i] == menor_pontuacao){ //se houver empate
+                return -2;
+            }
+            if (pontuacoes[i] < menor_pontuacao){
+                id_do_menor = i;
+                menor_pontuacao = pontuacoes[i];
+            }
+        }
+    } else {
+        return -1; //se nao retornou o jogador sem cartas e ainda tem cartas para comprar o jogo ainda nao acabou
+    }
+
+    return id_do_menor;
+}

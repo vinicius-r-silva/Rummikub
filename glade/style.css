@@ -193,3 +193,9 @@ button{
 #bt_continuar:hover{
 	background-image: url("../src/image/bt_continuar_hover.png");
 }
+#tela_empate{
+	background-image: url("../src/image/tela_empate.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}

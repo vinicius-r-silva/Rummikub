@@ -216,6 +216,7 @@ gboolean focus_out(GtkWidget *image, GdkEvent *event, gpointer user_data){
 void comprar_cartas_user(GtkWidget *widget, gpointer data){
   g_print("-> Apertou comprar cartas\n");
   //tela_ganhador(1);
+  bt_desabilita_compra();
   return;
 }
 

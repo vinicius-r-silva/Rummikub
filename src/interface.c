@@ -297,20 +297,50 @@ void tela_ganhador(int jogador){
   atualiza_janela();
 }
 
+void tela_empate(){
+  GtkWidget *tela_empate = gtk_fixed_new();
+  gtk_fixed_put(GTK_FIXED(fixed), tela_empate, 0, 0);
+
+  GtkWidget *event_box = gtk_event_box_new();
+  gtk_fixed_put(GTK_FIXED(tela_empate), event_box,0, 0);
+  gtk_widget_set_size_request(event_box, SCREEN_SIZE_X, SCREEN_SIZE_Y);
+  gtk_widget_set_name(event_box,"tela_empate");
+
+  //JOGADORES QUE EMPATARAM SERÃO CRIADOS AQUI
+  
+  GtkWidget *bt_final = gtk_button_new_with_label("");
+  gtk_fixed_put(GTK_FIXED(tela_empate), bt_final,447, 355);
+  gtk_widget_set_size_request(bt_final, 166, 46);
+  gtk_widget_set_name(bt_final,"bt_final");
+
+  //Evento fecha janela
+  g_signal_connect(G_OBJECT(bt_final),"button_press_event",G_CALLBACK(fecha_tela),tela_empate); 
+  atualiza_janela();
+}
 
 //Desabilita botão de comprar carta
-void bt_desabilita_compra(GtkWidget *widget, gpointer data){
+void bt_desabilita_compra(){
   GtkStyleContext *context;
   context = gtk_widget_get_style_context(bt_compra_carta);
   gtk_style_context_add_class(context,"bt_compra_carta_db");
+  g_signal_connect(G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(NULL), NULL); 
+
+}
+
+//Habilita compra de cartas
+void bt_habilita_compra(){
+  GtkStyleContext *context;
+  context = gtk_widget_get_style_context(bt_compra_carta);
+  gtk_style_context_remove_class(context,"bt_compra_carta_db");
+  g_signal_connect(G_OBJECT(bt_compra_carta),"button_press_event",G_CALLBACK(comprar_cartas_user), NULL); 
 }
 
 //Altera botão nova jogada para iniciar outro jogador
-void troca_bt_jogador(){
-  GtkStyleContext *context;
-  context = gtk_widget_get_style_context(bt_finaliza_jog);
-  gtk_style_context_add_class(context,"bt_novo_jogador");
-}
+// void troca_bt_jogador(){
+//   GtkStyleContext *context;
+//   context = gtk_widget_get_style_context(bt_finaliza_jog);
+//   gtk_style_context_add_class(context,"bt_novo_jogador");
+// }
 
 void Oculta_mao_Jogador(JOGADORES_PTR Jogador){
   LISTA_CARTAS_PTR atual = Jogador->cartas;

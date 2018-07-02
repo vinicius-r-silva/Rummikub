@@ -94,6 +94,7 @@ void tela_home(LISTA_CARTAS_PTR Baralho, JOGADORES_PTR *Lista_Jogadores){
   g_signal_connect(G_OBJECT(n_jogador5),"button_press_event",G_CALLBACK(ativa_n_jog),bts_n_jog);
 
   g_signal_connect(G_OBJECT(bt_inicial),"button_press_event",G_CALLBACK(comeca_jogo),bts_n_jog);
+
 }
 
 void comeca_jogo(GtkWidget *bt, gint response_id, LISTA_BT_JOG_PTR data){

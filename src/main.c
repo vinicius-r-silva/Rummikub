@@ -65,11 +65,9 @@ int main(int argc, char *argv[]) {
   Mesa = NULL;
   Init_Baralho(&Baralho, fixed);
   Lista_Jogadores = NULL;
-
   tela_home(Baralho, &Lista_Jogadores);
   constroi_janela_jogo(window); //carrega funções do GTK para criar a janela
   g_object_unref(icon);
-
 
   //tela_proximo_jogador(2);
   gtk_main(); //cria janela 

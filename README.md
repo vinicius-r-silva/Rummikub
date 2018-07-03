@@ -18,9 +18,9 @@ P = 6: Renan Peres Martins - 10716612<br>
 Ubuntu 18 (Obs.: Deve-se conter o GCC instalado) : Acesse a pasta onde estão localizados os arquivos fonte pelo terminal >> execute os comandos.
 
 <h4>Sistema operacional:</h4>
-Ubuntu com versão 18<br>
+Ubuntu com versão <b>18</b><br>
 
-<h4>Instalação do GCC (caso não venha pré instalado no Ubunto):</h4>
+<h4>Instalação do GCC (caso não venha pré instalado no Ubuntu):</h4>
 $ sudo apt-get install gcc<br>
 
 <h4>Instalação do GTK:</h4>

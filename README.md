@@ -21,13 +21,13 @@ Ubuntu 18 (Obs.: Deve-se conter o GCC instalado) : Acesse a pasta onde estão lo
 Ubuntu com versão 18<br>
 
 <h4>Instalação do GCC (caso não venha pré instalado no Ubunto):</h4>
-`$ sudo apt-get install gcc`
+$ sudo apt-get install gcc<br>
 
 <h4>Instalação do GTK:</h4>
-`$ sudo apt-get install libgtk-3-dev`<br>
+$ sudo apt-get install libgtk-3-dev<br>
 <b>Verificar se a versão instalada do GTK é igual ou superior a 3.2</b><br>
 <h4>Compilar programa:</h4>
-`$ make`
+$ make<br>
 
 Ou caso não deseje utilizar o makefile é possível compilar utilizando os comandos abaixo:<br>
 $ gcc -c -g -O0 -Wall -pthread -pipe src/main.c `pkg-config --cflags --libs gtk+-3.0` -o main.o<br>

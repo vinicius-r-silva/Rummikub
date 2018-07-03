@@ -1,4 +1,4 @@
-# Rummikub
+# Rummikub.c
 
 Este projeto visa construir o jogo Rummikub na linguagem C para a disciplina de Introdução à Ciência da Computação da Universidade de São Paulo. As regras originais do jogo foram implementadas no programa. Além disso foi utilizada a biblioteca Gtk para a criação da interface gráfica.<br>
 <b>Os usuários de Ubuntu 16 ou outras distribuições poderão enfrentar problemas na execução desse projeto, por causa da versão do GTK.</b><br>

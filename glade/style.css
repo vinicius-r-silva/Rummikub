@@ -7,6 +7,7 @@ window {
 }
 button{
 	border: 0;
+	background-repeat: no-repeat;
 }
 .bt_compra_carta{
 	background-image: url("../src/image/bt_comprar.png");
@@ -38,4 +39,163 @@ button{
 }
 .bt_finaliza_jog_db,.bt_finaliza_jog_db:hover,.bt_finaliza_jog_db:active{
 	background-image: url("../src/image/bt_finalizar_desabilitado.png");
+}
+#tela_bem_vindo{
+	background-image: url("../src/image/bem_vindo.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_pronto{
+	background-image: url("../src/image/bt_pronto.png");
+	background-repeat: no-repeat;
+	border: 0;
+}
+#bt_pronto:hover{
+	background-image: url("../src/image/bt_pronto_hover.png");
+}
+#bt_pronto:active{
+	background-image: url("../src/image/bt_pronto_foco.png");
+}
+#tela_erro_jogada{
+	background-image: url("../src/image/erro_jogada.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_ok{
+	background-image: url("../src/image/bt_ok.png");
+	background-repeat: no-repeat;
+	border: 0;
+}
+#bt_ok:hover{
+	background-image: url("../src/image/bt_ok_hover.png");
+}
+#bt_ok:active{
+	background-image: url("../src/image/bt_ok_foco.png");
+}
+
+#tela_ganha{
+	background-image: url("../src/image/ganhador_fundo.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_final{
+	background-image: url("../src/image/bt_final.png");
+	background-repeat: no-repeat;
+	border: 0;
+}
+#bt_final:hover{
+	background-image: url("../src/image/bt_final_hover.png");
+}
+#bt_final:active{
+	background-image: url("../src/image/bt_final_foco.png");
+}
+#img_jogador_1{
+	background-image: url("../src/image/jogador_1.png");
+}
+#img_jogador_2{
+	background-image: url("../src/image/jogador_2.png");
+}
+#img_jogador_3{
+	background-image: url("../src/image/jogador_3.png");
+}
+#img_jogador_4{
+	background-image: url("../src/image/jogador_4.png");
+}
+#img_jogador_5{
+	background-image: url("../src/image/jogador_5.png");
+}
+#tela_home{
+	background-image: url("../src/image/bg_home.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+.bt_n_jog_2{
+	background-image: url("../src/image/n2.png");
+}
+.bt_n_jog_3{
+	background-image: url("../src/image/n3.png");
+}
+.bt_n_jog_4{
+	background-image: url("../src/image/n4.png");
+}
+.bt_n_jog_5{
+	background-image: url("../src/image/n5.png");
+}
+
+.bt_n_jog_2_foco{
+	background-image: url("../src/image/n2_f.png");
+}
+.bt_n_jog_3_foco{
+	background-image: url("../src/image/n3_f.png");
+}
+.bt_n_jog_4_foco{
+	background-image: url("../src/image/n4_f.png");
+}
+.bt_n_jog_5_foco{
+	background-image: url("../src/image/n5_f.png");
+}
+#bt_iniciar{
+	background-image: url("../src/image/bt_iniciar.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-position: center;
+}
+#bt_iniciar:hover{
+	background-image: url("../src/image/bt_iniciar_hover.png");
+}
+#tela_tipo_entrada{
+	background-image: url("../src/image/tela_opcao_arquivo.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_sim{
+	background-image: url("../src/image/bt_sim.png");
+	background-position: center;
+}
+#bt_sim:hover{
+	background-image: url("../src/image/bt_sim_hover.png");
+}
+#bt_nao{
+	background-image: url("../src/image/bt_nao.png");
+	background-position: center;
+}
+#bt_nao:hover{
+	background-image: url("../src/image/bt_nao_hover.png");
+}
+#tela_erro_file_entrada{
+	background-image: url("../src/image/tela_erro_arquivo.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_erro_file{
+	background-image: url("../src/image/ok_v.png");
+	background-position: center;
+}
+#bt_erro_file:hover{
+	background-image: url("../src/image/ok_v_hover.png");
+}
+#tela_proximo{
+	background-image: url("../src/image/bg_prox_jogador.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
+}
+#bt_continuar{
+	background-image: url("../src/image/bt_continuar.png");
+	background-position: center;
+}
+#bt_continuar:hover{
+	background-image: url("../src/image/bt_continuar_hover.png");
+}
+#tela_empate{
+	background-image: url("../src/image/tela_empate.png");
+	background-repeat: no-repeat;
+	border: 0;
+	background-size: cover;
 }
